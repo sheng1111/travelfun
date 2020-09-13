@@ -36,18 +36,10 @@ if ( isset( $_POST[ 'signup' ] ) ) {
 		} else {
 			$errormsg = "註冊失敗，請重新註冊一次!";
 		}
-	}
-}
+    }
 
-//寄信功能
-mb_internal_encoding("utf-8");
-$to= $_POST['email'];
-$subject=mb_encode_mimeheader("TravelFun註冊會員","utf-8");
-$message="恭喜您成功註冊成為會員";
-$headers="MIME-Version: 1.0\r\n";
-$headers.="Content-type: text/html; charset=utf-8\r\n";
-$headers.="From:".mb_encode_mimeheader("TravelFun會員","utf-8")."<ysl58200@gmail.com>\r\n";
-mail($to,$subject,$message,$headers);
+
+}
 
 ?>
 
