@@ -16,7 +16,7 @@ include_once 'dbconnect.php';
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
     <link rel="stylesheet" href="css/mdb.min.css">
     <link rel="icon" href="image/favicon.png" type="image/ico" />
-    <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="css/index_style.css">
 </head>
 
 <body>
@@ -297,7 +297,7 @@ include_once 'dbconnect.php';
         <div class="footer-copyright text-center py-3">© 2020 Copyright: Travel Fun</div>
     </footer>
 
-    <script src='https://cdnjs.cloudflare.com/ajax/libs/gsap/3.5.0/gsap.min.js'></script><script  src="js/index.js"></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/gsap/3.5.0/gsap.min.js'></script><script  src="js/index_style.js"></script>
     <script type="text/javascript" src="js/mdb.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
