@@ -29,8 +29,8 @@ include_once 'dbconnect.php';
                 </button>
                 <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
                     <ul class="navbar-nav">
-                        <?php if (isset($_SESSION['id'])) { ?>
-                            <li class="nav-item p-0"><a class="nav-link disabled">Hi, <?php echo $_SESSION['name']; ?>!</a></li>
+                        <?php if (isset($_SESSION['user_id'])) { ?>
+                            <li class="nav-item p-0"><a class="nav-link disabled">Hi, <?php echo $_SESSION['user_name']; ?>!</a></li>
                         <?php } else  ?>
                         <li class="nav-item p-0"> <a class="nav-link disabled" href="index.php">首頁</a> </li>
                         <li class="nav-link p-0"> <a class="nav-link" href="#"><img src="image/itinerary.png" alt="itineray" height="25" width="25"></a> </li>
@@ -40,10 +40,9 @@ include_once 'dbconnect.php';
                               aria-haspopup="true" aria-expanded="false"><img src="image/login.png" alt="login" height="25" width="25">
                             </a>
                             <div class="dropdown-menu dropdown-menu-right dropdown-default"aria-labelledby="navbarDropdownMenuLink-333">
-                                <?php if (isset($_SESSION['id'])) { ?>
+                                <?php if (isset($_SESSION['user_id'])) { ?>
                                     <a class="dropdown-item" href="update.php">修改個資</a>
                                     <a class="dropdown-item" href="logout.php">登出</a>
-							        <a class="dropdown-item" href="index.php">切換為管理者</a>
                                 <?php } else { ?>
                                     <a class="dropdown-item" href="login.php">登入</a>
                                     <a class="dropdown-item" href="register.php">註冊</a>

@@ -1,53 +1,53 @@
 <?php
 session_start();
-if(isset($_SESSION['id'])) {	}
+if(isset($_SESSION['user_id'])) {	}
 else {header("Location: login.php");}
 include( "dbconnect.php" );
 
-	$result = mysqli_query( $con, "SELECT * FROM user WHERE `user`.`user_id` = '" . $_SESSION[ 'id' ] . "'" );
+	$result = mysqli_query( $con, "SELECT * FROM user WHERE `user`.`user_id` = '" . $_SESSION[ 'user_id' ] . "'");
 	$row = mysqli_fetch_assoc( $result );
 	$id = $row[ "user_id" ];
-	$mail = $row[ "user_email" ];
-	$Name = $row[ "user_name" ];
+	$useremail = $row[ "user_email" ];
+	$username = $row[ "user_name" ];
 
 
 	if ( isset( $_POST[ 'submit' ] ) ) {
-		$Name = strip_tags( $_POST[ 'name' ] );
-		$email = strip_tags( $_POST[ 'email' ] );
-		$pd = strip_tags( $_POST[ 'pd' ] );
-		$pd2 = strip_tags( $_POST[ 'cpd' ] );
-		$oldpd = strip_tags( $_POST[ 'inputpd' ] );
-		$dpd = $row[ "user_password" ];
+		$username = strip_tags( $_POST[ 'user_name' ] );
+		$useremail = strip_tags( $_POST[ 'user_email' ] );
+		$userpassword = strip_tags( $_POST[ 'password' ] );
+		$checkpassword = strip_tags( $_POST[ 'checkpassword' ] );
+		$oldpassword = strip_tags( $_POST[ 'oldpassword' ] );
+		$databasepassword = $row[ "user_password" ];
 
-		if ( $oldpd != "" ) {
-			if ( strlen( $pd ) < 6 ) {
+		if ( $oldpassword != "" ) {
+			if ( strlen( $userpassword ) < 6 ) {
 				$error = true;
 				$password_error = "你的密碼不能小於6碼喔!";
 			}
-			if ($pd != $pd2 ) {
+			if ($userpassword != $checkpassword ) {
 				$error = true;
 				$cpassword_error = "兩次密碼輸入要相同喔!";
 			}
-			if ( $dpd != $oldpd ) {
+			if ( $databasepassword != $oldpassword  ) {
 				$error = true;
 				$upassword_error = "您的舊密碼輸入錯誤!";
 			}
-		} else if ( $pd != ""or $pd2 != "" ) {
+		} else if ( $userpassword != ""or $checkpassword != "" ) {
 			$error = true;
 			$errormsg = "修改個人資料失敗";
 			$upassword_error2 = "請輸入舊密碼才能更改密碼喔!";
 		} else {
-			$pd = $dpd;
+			$userpassword = $databasepassword;
 		}
 
 
 		if ( !$error ) {
-			$_SESSION[ 'name' ] = $Name;
+			$_SESSION[ 'user_name' ] = $username;
 			$sqlUpdate = "UPDATE user SET
-				user_email='" . $email . "',
-				user_name='" . $Name . "',
-				user_password='" . $pd . "'
-				WHERE `user_id` = '" . $_SESSION[ 'id' ] . "'";
+				user_email='" . $useremail . "',
+				user_name='" . $username . "',
+				user_password='" . $userpassword . "'
+				WHERE `user_id` = '" . $id . "'";
 			$row1 = mysqli_query( $con, $sqlUpdate );
 			if ( !empty( $row1 ) ) {
 				$successmsg = "修改個人資料成功";
@@ -78,9 +78,9 @@ include( "dbconnect.php" );
 </head>
 
 <body>
-
+<?php  echo $sqlUpdate; ?>
 <body>
-	<header>
+<header>
         <nav class="navbar navbar-expand-lg navbar-dark fixed-top unique-color">
             <div class="container">
                 <a class="navbar-brand" href="index.php" ><strong>Travel Fun</strong></a>
@@ -89,10 +89,10 @@ include( "dbconnect.php" );
                 </button>
                 <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
                     <ul class="navbar-nav">
-                        <?php if (isset($_SESSION['id'])) { ?>
-                            <li class="nav-item p-0"><a class="nav-link disabled">Hi, <?php echo $_SESSION['name']; ?>!</a></li>
+                        <?php if (isset($_SESSION['user_id'])) { ?>
+                            <li class="nav-item p-0"><a class="nav-link disabled">Hi, <?php echo $_SESSION['user_name']; ?>!</a></li>
                         <?php } else  ?>
-                        <li class="nav-item p-0"> <a class="nav-link" href="index.php">首頁</a> </li>
+                        <li class="nav-item p-0"> <a class="nav-link disabled" href="index.php">首頁</a> </li>
                         <li class="nav-link p-0"> <a class="nav-link" href="#"><img src="image/itinerary.png" alt="itineray" height="25" width="25"></a> </li>
                         <li class="nav-link p-0"> <a class="nav-link" href="#"><img src="image/search.png" alt="search" height="25" width="25"></a> </li>
                         <li class="nav-item dropdown">
@@ -100,10 +100,9 @@ include( "dbconnect.php" );
                               aria-haspopup="true" aria-expanded="false"><img src="image/login.png" alt="login" height="25" width="25">
                             </a>
                             <div class="dropdown-menu dropdown-menu-right dropdown-default"aria-labelledby="navbarDropdownMenuLink-333">
-                                <?php if (isset($_SESSION['id'])) { ?>
+                                <?php if (isset($_SESSION['user_id'])) { ?>
                                     <a class="dropdown-item" href="update.php">修改個資</a>
                                     <a class="dropdown-item" href="logout.php">登出</a>
-							        <a class="dropdown-item" href="index.php">切換為管理者</a>
                                 <?php } else { ?>
                                     <a class="dropdown-item" href="login.php">登入</a>
                                     <a class="dropdown-item" href="register.php">註冊</a>
@@ -126,24 +125,24 @@ include( "dbconnect.php" );
 					  <input type="text" name="id" value="<?PHP echo $id; ?>" class="form-control mb-4" disabled="true"/></div>
 
 					<div class="form-group"><label for="name">☀電子郵件</label>
-					  <input type="email" name="email" value="<?PHP echo $mail; ?>" class="form-control mb-4" /></div>
+					  <input type="email" name="user_email" value="<?PHP echo $useremail; ?>" class="form-control mb-4" /></div>
 
 					<div class="form-group"><label>☀姓名</label>
-					  <input type="text" name="name" class="form-control mb-4" value="<?PHP echo $Name; ?>"/></div>
+					  <input type="text" name="user_name" class="form-control mb-4" value="<?PHP echo $username; ?>"/></div>
 
 					<div class="form-group"><label for="name">☀輸入舊密碼</label>
-					  <input type="password" name="inputpd" maxlength="20" placeholder="輸入舊密碼" class="form-control mb-4"/></div>
+					  <input type="password" name="oldpassword" maxlength="20" placeholder="輸入舊密碼" class="form-control mb-4"/></div>
 					<span class="text-danger"><?php if (isset($upassword_error)) echo $upassword_error; ?></span>
 
 					<div class="form-group"><label for="name">☀輸入新密碼</label>
-					  <input type="password" name="pd" maxlength="20" placeholder="輸入新密碼" class="form-control mb-4"/></div>
+					  <input type="password" name="password" maxlength="20" placeholder="輸入新密碼" class="form-control mb-4"/></div>
 					<span class="text-danger"><?php if (isset($password_error)) echo $password_error; ?></span>
 
 					<div class="form-group"><label for="name">☀再次輸入新密碼</label>
-					  <input type="password" name="cpd" maxlength="20" placeholder="再次輸入新密碼" class="form-control mb-4"/></div>
+					  <input type="password" name="checkpassword" maxlength="20" placeholder="再次輸入新密碼" class="form-control mb-4"/></div>
 					<span class="text-danger"><?php if (isset($cpassword_error)) echo $cpassword_error; ?></span>
 
-				   <center><button class="btn btn-info btn-block my-4" type="submit" name="submit"" >更改個資</button></center>
+				   <center><button class="btn btn-info btn-block my-4" type="submit" name="submit" >更改個資</button></center>
 
 				</form>
 			</div>

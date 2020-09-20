@@ -1,18 +1,18 @@
 <?php
 session_start();
-if(isset($_SESSION['id'])!="") {
+if(isset($_SESSION['user_id'])!="") {
 	header("Location: index.php");
 }
 include_once 'dbconnect.php';
 //check if form is submitted
 if (isset($_POST['login'])) {
-    $sql="SELECT * FROM user WHERE user_id = '" . $_POST["id"]. "' and user_password = '" . $_POST["password"] . "'";
+    $sql="SELECT * FROM user WHERE user_id = '" . $_POST["user_id"]. "' and user_password = '" . $_POST["user_password"] . "'";
 	$result = mysqli_query($con, $sql);
 	$row = mysqli_fetch_assoc($result);
 
 	if (!empty($row)) {
-		$_SESSION['id'] = $row['user_id'];
-		$_SESSION['name'] = $row['user_name'];
+		$_SESSION['user_id'] = $row['user_id'];
+		$_SESSION['user_name'] = $row['user_name'];
 		header("Location: index.php");
 	} else {
         $errormsg = "帳號或密碼輸入錯誤!!!";
@@ -39,7 +39,7 @@ if (isset($_POST['login'])) {
 </head>
 
 <body>
-    <header>
+<header>
         <nav class="navbar navbar-expand-lg navbar-dark fixed-top unique-color">
             <div class="container">
                 <a class="navbar-brand" href="index.php" ><strong>Travel Fun</strong></a>
@@ -48,21 +48,20 @@ if (isset($_POST['login'])) {
                 </button>
                 <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
                     <ul class="navbar-nav">
-                        <?php if (isset($_SESSION['id'])) { ?>
-                            <li class="nav-item p-0"><a class="nav-brand">Hi, <?php echo $_SESSION['name']; ?>!</a></li>
+                        <?php if (isset($_SESSION['user_id'])) { ?>
+                            <li class="nav-item p-0"><a class="nav-link disabled">Hi, <?php echo $_SESSION['user_name']; ?>!</a></li>
                         <?php } else  ?>
-                        <li class="nav-item p-0"> <a class="nav-link" href="index.php">首頁</a> </li>
-                        <li class="nav-link p-0"> <a class="nav-link" href="#"><img src="image/itinerary.png" alt="itineray" height="25" width="25"></a> </li><!--尚未完成 -->
-                        <li class="nav-link p-0"> <a class="nav-link" href="#"><img src="image/search.png" alt="search" height="25" width="25"></a> </li><!--尚未完成 -->
+                        <li class="nav-item p-0"> <a class="nav-link disabled" href="index.php">首頁</a> </li>
+                        <li class="nav-link p-0"> <a class="nav-link" href="#"><img src="image/itinerary.png" alt="itineray" height="25" width="25"></a> </li>
+                        <li class="nav-link p-0"> <a class="nav-link" href="#"><img src="image/search.png" alt="search" height="25" width="25"></a> </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink-333" data-toggle="dropdown"
                               aria-haspopup="true" aria-expanded="false"><img src="image/login.png" alt="login" height="25" width="25">
                             </a>
                             <div class="dropdown-menu dropdown-menu-right dropdown-default"aria-labelledby="navbarDropdownMenuLink-333">
-                                <?php if (isset($_SESSION['id'])) { ?>
+                                <?php if (isset($_SESSION['user_id'])) { ?>
                                     <a class="dropdown-item" href="update.php">修改個資</a>
                                     <a class="dropdown-item" href="logout.php">登出</a>
-							        <a class="dropdown-item" href="index.php">切換為管理者</a>
                                 <?php } else { ?>
                                     <a class="dropdown-item" href="login.php">登入</a>
                                     <a class="dropdown-item" href="register.php">註冊</a>
@@ -79,12 +78,12 @@ if (isset($_POST['login'])) {
         <div class="py-md-5">
             <div class="container">
                 <form class="text-center p-5 col-md-6 offset-md-3" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post" name="loginform">
-                    <h4 class="text-center card-title"><b>登入</b></h4>
+                    <h4 class="text-center card-title"><b>使用者登入</b></h4>
 					<hr class="">
                     <!-- Email -->
-                    <div class="form-group"><input type="text" name="id" class="form-control mb-4" placeholder="請輸入帳號" ></div>
+                    <div class="form-group"><input type="text" name="user_id" class="form-control mb-4" placeholder="請輸入帳號" ></div>
                     <!-- Password -->
-                    <div class="form-group"><input type="password" name="password"  class="form-control mb-4" placeholder="請輸入密碼"></div>
+                    <div class="form-group"><input type="password" name="user_password"  class="form-control mb-4" placeholder="請輸入密碼"></div>
                     <div class="d-flex justify-content-around">
                         <div>
                             <!-- Remember me -->
