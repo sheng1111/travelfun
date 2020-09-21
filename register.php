@@ -8,14 +8,15 @@ if ( isset( $_SESSION[ 'user_id' ] ) ) {
 include_once 'dbconnect.php';
 
 //set validation error flag as false
-$error = false;
-$key_id=$_POST[ 'user_id' ];
-$cheek_password=$_POST[ 'cheek_password' ] ;
-$userpassword=$_POST[ 'user_password' ];
-$username=$_POST[ 'user_name' ];
-$useremail=$_POST[ 'user_email' ];
+
 //check if form is submitted
 if ( isset( $_POST[ 'signup' ] ) ) {
+    $error = false;
+    $key_id=$_POST[ 'user_id' ];
+    $cheek_password=$_POST[ 'cheek_password' ] ;
+    $userpassword=$_POST[ 'user_password' ];
+    $username=$_POST[ 'user_name' ];
+    $useremail=$_POST[ 'user_email' ];
     $check = "SELECT `user_id` FROM `user` WHERE `user_id` ='" .$key_id . "'";
 	$result = mysqli_query( $con, $check );
 	$row = mysqli_fetch_assoc( $result );
@@ -42,6 +43,7 @@ if ( isset( $_POST[ 'signup' ] ) ) {
 		}
 	}
 }
+
 
 ?>
 
