@@ -9,7 +9,7 @@ if (isset($_POST['login'])) {
 	if (!empty($row)) {
 		$_SESSION['admin_id'] = $row['admin_id'];
 		$_SESSION['admin_name'] = $row['admin_name'];
-		header("Location:404.html");
+		header("Location:404.php");
 	} else {
         $errormsg = "帳號或密碼輸入錯誤!!!";
 	}
@@ -45,7 +45,7 @@ if (isset($_POST['login'])) {
                             <li class="nav-item p-0"><a class="nav-link disabled">Hi, <?php echo $_SESSION['admin_name']; ?>!</a></li>
                         <?php } else  ?>
                         <li class="nav-item p-0"> <a class="nav-link disabled" href="index.php">首頁</a> </li>
-                        <li class="nav-link p-0"> <a class="nav-link" href="404.html"><img src="../image/addsight.png" alt="新增景點" height="25" width="25"></a> </li>
+                        <li class="nav-link p-0"> <a class="nav-link" href="404.php"><img src="../image/addsight.png" alt="新增景點" height="25" width="25"></a> </li>
                         <li class="nav-link p-0"> <a class="nav-link" href="logout.php"><img src="../image/logout.png" alt="登出" height="25" width="25"></a> </li>
                     </ul>
                 </div>
@@ -66,6 +66,7 @@ if (isset($_POST['login'])) {
 			<center><button class="btn btn-info btn-block my-4" type="submit" name="login">登入</button></center>
 		</form>
 	</div>
+
 
 	<script type="text/javascript" src="../js/mdb.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
