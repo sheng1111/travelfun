@@ -40,15 +40,32 @@ include( "dbconnect.php" );
 			$userpassword = $databasepassword;
 		}
 
+		//產生亂數KEY
+		function random_string($length, $characters) {
+			if (!is_int($length) || $length < 0) {
+				return false;
+			}
+			$characters_length = strlen($characters) - 1;
+			$string = '';
+
+			for ($i = 0; $i < $length; $i++) {
+				$string .= $characters[mt_rand(0, $characters_length)];
+			}
+			return $string;
+		}
+		$random = random_string(32,'0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
 
 		if ( !$error ) {
 			$_SESSION[ 'user_name' ] = $username;
 			$sqlUpdate = "UPDATE user SET
 				user_email='" . $useremail . "',
 				user_name='" . $username . "',
-				user_password='" . $userpassword . "'
+				user_password='" . $userpassword . "',
+				user_key='" . $random . "'
 				WHERE `user_id` = '" . $id . "'";
 			$row1 = mysqli_query( $con, $sqlUpdate );
+			setcookie ("user_key", $random, time()+ (60*60));
+
 			if ( !empty( $row1 ) ) {
 				$successmsg = "修改個人資料成功";
 			} else {
@@ -142,6 +159,8 @@ include( "dbconnect.php" );
 					  <input type="password" name="checkpassword" maxlength="20" placeholder="再次輸入新密碼" class="form-control mb-4"/></div>
 					<span class="text-danger"><?php if (isset($cpassword_error)) echo $cpassword_error; ?></span>
 
+					<span class="text-success"><?php if (isset($errormsg)) echo $errormsg; ?></span>
+					<span class="text-danger"><?php if (isset($errormsg)) echo $errormsg; ?></span>
 				   <center><button class="btn btn-info btn-block my-4" type="submit" name="submit" >更改個資</button></center>
 
 				</form>

@@ -1,9 +1,19 @@
 <?php
 session_start();
+include_once 'dbconnect.php';
 if(isset($_SESSION['user_id'])!="") {
 	header("Location: index.php");
 }
-include_once 'dbconnect.php';
+
+$sql2 = "SELECT * FROM user WHERE user_key = '" . $_COOKIE["user_key"]. "'";
+$row2 = mysqli_fetch_assoc(mysqli_query($con, $sql2));
+if($_COOKIE["user_key"] = $row2["user_key"]){
+    $_SESSION['user_id'] = $row2["user_id"];
+    $_SESSION['user_name'] = $row2["user_name"];
+    header("Location: index.php");
+
+}
+
 //check if form is submitted
 if (isset($_POST['login'])) {
     $sql="SELECT * FROM user WHERE user_id = '" . $_POST["user_id"]. "' and user_password = '" . $_POST["user_password"] . "'";
@@ -12,12 +22,18 @@ if (isset($_POST['login'])) {
 
 	if (!empty($row)) {
 		$_SESSION['user_id'] = $row['user_id'];
-		$_SESSION['user_name'] = $row['user_name'];
-		header("Location: index.php");
-	} else {
-        $errormsg = "帳號或密碼輸入錯誤!!!";
-	}
+        $_SESSION['user_name'] = $row['user_name'];
+
+
+        if(!empty($_POST["remember"])) {
+            setcookie ("user_key", $row["user_key"], time()+ (60*60));
+        }
+
+        header("Location: index.php");
+    }
+    else{$errormsg = "帳號或密碼輸入錯誤!!!";}
 }
+
 ?>
 
 <html>
@@ -37,6 +53,7 @@ if (isset($_POST['login'])) {
 </head>
 
 <body>
+
 <header>
         <nav class="navbar navbar-expand-lg navbar-dark fixed-top unique-color">
             <div class="container">
@@ -79,14 +96,15 @@ if (isset($_POST['login'])) {
                     <h4 class="text-center card-title"><b>使用者登入</b></h4>
 					<hr class="">
                     <!-- Email -->
-                    <div class="form-group"><input type="text" name="user_id" class="form-control mb-4" placeholder="請輸入帳號" ></div>
+                    <div class="form-group"><input type="text" name="user_id" class="form-control mb-4" placeholder="請輸入帳號" value="<?PHP echo $_COOKIE["user_id"] ?>" ></div>
                     <!-- Password -->
-                    <div class="form-group"><input type="password" name="user_password"  class="form-control mb-4" placeholder="請輸入密碼"></div>
+                    <div class="form-group"><input type="password" name="user_password"  class="form-control mb-4" placeholder="請輸入密碼" value="<?PHP echo $_COOKIE["user_password"] ?>"></div>
+                    <span class="text-danger"><?php if (isset($errormsg)) echo $errormsg; ?></span>
                     <div class="d-flex justify-content-around">
                         <div>
                             <!-- Remember me -->
                             <div class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input" id="defaultLoginFormRemember">
+                                <input type="checkbox" class="custom-control-input" id="defaultLoginFormRemember" name="remember">
                                 <label class="custom-control-label" for="defaultLoginFormRemember">記住我</label><!--尚未完成 -->
                             </div>
                         </div>

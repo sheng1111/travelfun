@@ -20,7 +20,22 @@ if ( isset( $_POST[ 'signup' ] ) ) {
     $check = "SELECT `user_id` FROM `user` WHERE `user_id` ='" .$key_id . "'";
 	$result = mysqli_query( $con, $check );
 	$row = mysqli_fetch_assoc( $result );
-	$databaseid = $row[ "user_id" ];
+    $databaseid = $row[ "user_id" ];
+
+    function random_string($length, $characters) {
+        if (!is_int($length) || $length < 0) {
+            return false;
+        }
+        $characters_length = strlen($characters) - 1;
+        $string = '';
+
+        for ($i = 0; $i < $length; $i++) {
+            $string .= $characters[mt_rand(0, $characters_length)];
+        }
+        return $string;
+    }
+    $random = random_string(32,'0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
+
 	if ( strlen( $userpassword ) < 6 ) {
 		$error = true;
 		$password_error = "你的密碼不能小於6碼喔!";
@@ -32,10 +47,11 @@ if ( isset( $_POST[ 'signup' ] ) ) {
 	if ( $databaseid == $key_id ) {
 		$error = true;
 		$id_error = "這個帳號已經有人註冊過了!";
-	}
+    }
+
 	if ( !$error ) {
-		$sql="INSERT INTO `user`(`user_id`, `user_name`, `user_email`, `user_password`) VALUES
-		('" . $key_id . "', '" . $username . "','" . $useremail . "','" . $userpassword. "')" ;
+		$sql="INSERT INTO `user`(`user_id`, `user_name`, `user_email`, `user_password`, `user_key`) VALUES
+		('" . $key_id . "', '" . $username . "','" . $useremail . "','" . $userpassword. "', '" . $random . "')" ;
 		if ( mysqli_query( $con, $sql ) ) {
 			$successmsg = "註冊成功 <a href='login.php'>請登入</a>";
 		} else {
