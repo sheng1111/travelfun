@@ -11,7 +11,6 @@ if($_COOKIE["user_key"] = $row2["user_key"]){
     $_SESSION['user_id'] = $row2["user_id"];
     $_SESSION['user_name'] = $row2["user_name"];
     header("Location: index.php");
-
 }
 
 //check if form is submitted
@@ -105,21 +104,23 @@ if (isset($_POST['login'])) {
                             <!-- Remember me -->
                             <div class="custom-control custom-checkbox">
                                 <input type="checkbox" class="custom-control-input" id="defaultLoginFormRemember" name="remember">
-                                <label class="custom-control-label" for="defaultLoginFormRemember">記住我</label><!--尚未完成 -->
+                                <label class="custom-control-label" for="defaultLoginFormRemember">記住我</label>
                             </div>
                         </div>
-                        <div><!-- Forgot password --><a href="">Forgot password?</a> <!--尚未完成 --></div>
+                        <div><a href="forgot_password.php">忘記密碼</a></div>
                     </div>
                     <!-- Sign in button -->
                     <center><button class="btn btn-info btn-block my-4" type="submit" name="login">登入</button></center>
                     <!-- Register -->
-                    <p>Not a member? <a href="register.php">註冊</a></p>
-                    <!-- Social login --><!--尚未完成 -->
+                    <p>不是會員?<a href="register.php">註冊</a></p>
+                    <!--
                     <p>or sign in with:</p>
                     <a href="#" class="mx-2" role="button"><i class="fab fa-facebook-f light-blue-text"></i></a>
                     <a href="#" class="mx-2" role="button"><i class="fab fa-twitter light-blue-text"></i></a>
                     <a href="#" class="mx-2" role="button"><i class="fab fa-linkedin-in light-blue-text"></i></a>
                     <a href="#" class="mx-2" role="button"><i class="fab fa-github light-blue-text"></i></a>
+                     --><!--尚未完成 -->
+
                 </form>
             </div>
         </div>

@@ -134,11 +134,13 @@ if ( isset( $_POST[ 'signup' ] ) ) {
                     <span class="text-success"><?php if (isset($successmsg)) echo $successmsg; ?></span>
                     <span class="text-danger"><?php if (isset($errormsg)) { echo $errormsg; } ?></span>
                     <div class="text-center">
+                        <!--
                         <p>or sign up with:</p>
                         <a type="button" class="light-blue-text mx-2"><i class="fab fa-facebook-f"></i></a>
                         <a type="button" class="light-blue-text mx-2"><i class="fab fa-twitter"></i></a>
                         <a type="button" class="light-blue-text mx-2"><i class="fab fa-linkedin-in"></i></a>
                         <a type="button" class="light-blue-text mx-2"><i class="fab fa-github"></i></a>
+                         -->
                     </div>
                 </form>
             </div>
