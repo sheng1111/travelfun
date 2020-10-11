@@ -9,7 +9,7 @@ if (isset($_POST['login'])) {
 	if (!empty($row)) {
 		$_SESSION['admin_id'] = $row['admin_id'];
 		$_SESSION['admin_name'] = $row['admin_name'];
-		header("Location:404.php");
+		header("Location:addsight.php");
 	} else {
         $errormsg = "帳號或密碼輸入錯誤!!!";
 	}
@@ -27,7 +27,7 @@ if (isset($_POST['login'])) {
 
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-    <link rel="stylesheet" href="../css/mdb.min.css">
+	<link rel="stylesheet" href="../css/mdb.min.css">
 
 </head>
 
@@ -44,8 +44,8 @@ if (isset($_POST['login'])) {
                         <?php if (isset($_SESSION['admin_id'])) { ?>
                             <li class="nav-item p-0"><a class="nav-link disabled">Hi, <?php echo $_SESSION['admin_name']; ?>!</a></li>
                         <?php } else  ?>
-                        <li class="nav-item p-0"> <a class="nav-link disabled" href="index.php">首頁</a> </li>
-                        <li class="nav-link p-0"> <a class="nav-link" href="404.php"><img src="../image/addsight.png" alt="新增景點" height="25" width="25"></a> </li>
+                        <li class="nav-item p-0"> <a class="nav-link disabled" href="index.php">新增景點</a> </li>
+                        <li class="nav-link p-0"> <a class="nav-link" href="addsight.php"><img src="../image/addsight.png" alt="新增景點" height="25" width="25"></a> </li>
                         <li class="nav-link p-0"> <a class="nav-link" href="logout.php"><img src="../image/logout.png" alt="登出" height="25" width="25"></a> </li>
                     </ul>
                 </div>
