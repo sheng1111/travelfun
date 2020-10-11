@@ -34,6 +34,8 @@ if ( isset( $_POST[ 'signup' ] ) ) {
         }
         return $string;
     }
+
+    //給予user_key
     $random = random_string(32,'0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
 
 	if ( strlen( $userpassword ) < 6 ) {
