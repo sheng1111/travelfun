@@ -135,9 +135,6 @@ function resize_photo($src_file, $src_ext, $dest_name, $max_size)
                         <p>
                             <input class="btn btn-info btn-block my-4" type="submit" name="submit" value="新增景點">
                             <input class="btn btn-info btn-block my-4" type="button" name="button" value="回上一頁" onClick="window.history.back();">
-                            <?PHP echo $sql; ?>
-                            <?PHP echo $sights_id; ?>
-                            <?PHP echo $sql_photos; ?>
                         </p>
                 </form>
             </div>
