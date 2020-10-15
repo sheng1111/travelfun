@@ -104,7 +104,7 @@ if (isset($_POST['login'])) {
                             <!-- Remember me -->
                             <div class="custom-control custom-checkbox">
                                 <input type="checkbox" class="custom-control-input" id="defaultLoginFormRemember" name="remember">
-                                <label class="custom-control-label" for="defaultLoginFormRemember">記住我</label>
+                                <label class="custom-control-label" for="defaultLoginFormRemember">自動登入</label>
                             </div>
                         </div>
                         <div><a href="forgot_password.php">忘記密碼</a></div>
