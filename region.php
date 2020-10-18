@@ -1,20 +1,20 @@
 ﻿<?php
   include_once 'dbconnect.php';
-  //require_once("connMysql.php");
+
   session_start();
   if (!empty($_GET["sights_name"])){
     $mode_id=$_GET[ 'searchmode' ];
     $name=$_GET["sights_name"];
     switch ($mode_id){
         case 0:
-        $sql = "SELECT sights.sights_id, sights.sights_name, photo.photo_file, count(photo.sights_id)";
+        $sql = "SELECT sights.sights_id, sights.sights_name, photos.photos_file, count(photos.sights_id)";
         $sql .= " FROM sights, photo";
         $sql .= " WHERE sights.sights_name='$name' and sights.sights_id=photo.sights_id";
         $sql .= " GROUP BY sights.sights_id";
         $result = mysqli_query($con,$sql);
         break;
         case 1:
-        $sql = "SELECT sights.sights_id, sights.sights_name, photo.photo_file, count(photo.sights_id)";
+        $sql = "SELECT sights.sights_id, sights.sights_name, photos.photos_file, count(photos.sights_id)";
         $sql .= " FROM sights, photo";
         $sql .= " WHERE sights.sights_name like '%$name%' and sights.sights_id=photo.sights_id";
         $sql .= " GROUP BY sights.sights_id";

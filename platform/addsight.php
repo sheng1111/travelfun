@@ -3,7 +3,7 @@ session_start();
 
 include_once '../dbconnect.php';
 if (isset($_POST['submit'])) {
-    $sql = "INSERT INTO sights(sights_name, sights_tel, sights_address, sights_intro)VALUES(" . $_POST["sights_name"] . ", '" . $_POST["sights_tel"] . "', '" . $_POST["sights_address"] . "',  '" . $_POST["sights_intro"] . "')";
+    $sql = "INSERT INTO sights(sights_name, sights_tel, sights_address, sights_intro)VALUES('" . $_POST["sights_name"] . "', '" . $_POST["sights_tel"] . "', '" . $_POST["sights_address"] . "',  '" . $_POST["sights_intro"] . "')";
     mysqli_query($con, $sql);
     if ($_FILES["up_photo"] != "") {
         $sights_id = mysqli_insert_id($con);
