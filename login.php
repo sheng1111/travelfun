@@ -66,8 +66,8 @@ if (isset($_POST['login'])) {
                             <li class="nav-item p-0"><a class="nav-link disabled">Hi, <?php echo $_SESSION['user_name']; ?>!</a></li>
                         <?php } else  ?>
                         <li class="nav-item p-0"> <a class="nav-link disabled" href="index.php">登入</a> </li>
-                        <li class="nav-link p-0"> <a class="nav-link" href="#"><img src="image/itinerary.png" alt="itineray" height="25" width="25"></a> </li>
-                        <li class="nav-link p-0"> <a class="nav-link" href="#"><img src="image/search.png" alt="search" height="25" width="25"></a> </li>
+                        <li class="nav-link p-0"> <a class="nav-link" href="404.html"><img src="image/itinerary.png" alt="itineray" height="25" width="25"></a> </li>
+                        <li class="nav-link p-0"> <a class="nav-link" href="404.html"><img src="image/search.png" alt="search" height="25" width="25"></a> </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink-333" data-toggle="dropdown"
                               aria-haspopup="true" aria-expanded="false"><img src="image/login.png" alt="login" height="25" width="25">
@@ -104,7 +104,7 @@ if (isset($_POST['login'])) {
                             <!-- Remember me -->
                             <div class="custom-control custom-checkbox">
                                 <input type="checkbox" class="custom-control-input" id="defaultLoginFormRemember" name="remember">
-                                <label class="custom-control-label" for="defaultLoginFormRemember">記住我</label>
+                                <label class="custom-control-label" for="defaultLoginFormRemember">自動登入</label>
                             </div>
                         </div>
                         <div><a href="forgot_password.php">忘記密碼</a></div>

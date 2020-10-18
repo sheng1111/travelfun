@@ -34,6 +34,8 @@ if ( isset( $_POST[ 'signup' ] ) ) {
         }
         return $string;
     }
+
+    //給予user_key
     $random = random_string(32,'0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
 
 	if ( strlen( $userpassword ) < 6 ) {
@@ -94,8 +96,8 @@ if ( isset( $_POST[ 'signup' ] ) ) {
                             <li class="nav-item p-0"><a class="nav-link disabled">Hi, <?php echo $_SESSION['user_name']; ?>!</a></li>
                         <?php } else  ?>
                         <li class="nav-item p-0"> <a class="nav-link disabled" href="index.php">註冊</a> </li>
-                        <li class="nav-link p-0"> <a class="nav-link" href="#"><img src="image/itinerary.png" alt="itineray" height="25" width="25"></a> </li>
-                        <li class="nav-link p-0"> <a class="nav-link" href="#"><img src="image/search.png" alt="search" height="25" width="25"></a> </li>
+                        <li class="nav-link p-0"> <a class="nav-link" href="404.html"><img src="image/itinerary.png" alt="itineray" height="25" width="25"></a> </li>
+                        <li class="nav-link p-0"> <a class="nav-link" href="404.html"><img src="image/search.png" alt="search" height="25" width="25"></a> </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink-333" data-toggle="dropdown"
                               aria-haspopup="true" aria-expanded="false"><img src="image/login.png" alt="login" height="25" width="25">
