@@ -11,21 +11,12 @@ if (isset($_POST['submit'])) {
     $word = $_POST['keyword'];
     if (empty($word)) {
         $id = $_POST['region_id'];
-        if ($id = "") {
-            $error = true;
-            $messageerror = "請選出一個選項，謝謝!";
-        } {
-            if (!$error) {
-                header("Location:region.php?region_id=$id");
-            }
-        }
-    } else {
-
+        header("Location:region.php?region_id=$id");}     
+     else {
         $searchmode = $_POST['searchmode'];
         header("Location:region.php?sights_name=$word&searchmode=$searchmode");
     }
 }
-
 ?>
 <!DOCTYPE html>
 <html>
