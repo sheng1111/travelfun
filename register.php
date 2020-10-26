@@ -6,6 +6,7 @@ if ( isset( $_SESSION[ 'user_id' ] ) ) {
 }
 
 include_once 'dbconnect.php';
+include 'function.php';
 
 //set validation error flag as false
 
@@ -21,19 +22,6 @@ if ( isset( $_POST[ 'signup' ] ) ) {
 	$result = mysqli_query( $con, $check );
 	$row = mysqli_fetch_assoc( $result );
     $databaseid = $row[ "user_id" ];
-
-    function random_string($length, $characters) {
-        if (!is_int($length) || $length < 0) {
-            return false;
-        }
-        $characters_length = strlen($characters) - 1;
-        $string = '';
-
-        for ($i = 0; $i < $length; $i++) {
-            $string .= $characters[mt_rand(0, $characters_length)];
-        }
-        return $string;
-    }
 
     //給予user_key
     $random = random_string(32,'0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
