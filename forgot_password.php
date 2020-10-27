@@ -11,10 +11,12 @@ if (isset($_POST['forgot_password'])) {
         $user_name = $row["user_name"];
         $user_email = $row["user_email"];
         $user_password = $row["user_password"];
+        $title = "TravelFun會員資料";
+        $content = '<span style="color:red">** 本郵件由系統自動發送，請勿直接回覆 **</span> <p>' . $user_name . '，您好! <br>' . '您的密碼為:' . $user_password . '<p><p><span style="color:#878787">--</span><br><span style="color:#878787">Best Regard</span><br><span style="color:#878787">TravelFun團隊</span>';
+        $result = "<script> alert('成功寄出密碼');parent.location.href='login.php'; </script>";
 
         //寄信
-        sendmail($user_name, $user_email, $user_password);
-
+        sendmail($user_name, $user_email, $title, $content, $result);
     } else {
         $errormsg = "輸入的帳號和信箱不符!!!";
     }
@@ -22,6 +24,7 @@ if (isset($_POST['forgot_password'])) {
 ?>
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
