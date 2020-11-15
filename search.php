@@ -11,10 +11,10 @@ if (isset($_POST['submit'])) {
     $word = $_POST['keyword'];
     if (empty($word)) {
         $id = $_POST['region_id'];
-        header("Location:region.php?region_id=$id");}     
-     else {
+        header("Location:region.php?region_id=$id");
+    } else {
         $searchmode = $_POST['searchmode'];
-        header("Location:region.php?sights_name=$word&searchmode=$searchmode");
+        header("Location:result.php?sights_name=$word&searchmode=$searchmode");
     }
 }
 ?>
@@ -26,7 +26,7 @@ if (isset($_POST['submit'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Travel Fun">
     <meta name="keywords" content="Travel">
-    <title>搜尋｜TravelFun</title>
+    <title>搜尋景點｜TravelFun</title>
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.11.2/css/all.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
@@ -49,8 +49,8 @@ if (isset($_POST['submit'])) {
                             <li class="nav-item p-0"><a class="nav-link disabled">Hi, <?php echo $_SESSION['user_name']; ?>!</a></li>
                         <?php } else  ?>
                         <li class="nav-item p-0"> <a class="nav-link disabled" href="index.php">首頁</a> </li>
-                        <li class="nav-link p-0"> <a class="nav-link" href="#"><img src="image/itinerary.png" alt="itineray" height="25" width="25"></a> </li>
-                        <li class="nav-link p-0"> <a class="nav-link" href="#"><img src="image/search.png" alt="search" height="25" width="25"></a> </li>
+                        <li class="nav-link p-0"> <a class="nav-link" href="404.html"><img src="image/itinerary.png" alt="itineray" height="25" width="25"></a> </li>
+                        <li class="nav-link p-0"> <a class="nav-link" href="search.php"><img src="image/search.png" alt="search" height="25" width="25"></a> </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink-333" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img src="image/login.png" alt="login" height="25" width="25">
                             </a>
