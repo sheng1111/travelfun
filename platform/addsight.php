@@ -2,7 +2,14 @@
 session_start();
 
 include_once '../dbconnect.php';
+
+$sql_region = "SELECT region_id,region_name";
+$sql_region .= " FROM region";
+$result = mysqli_query($con, $sql_region);
+$total_records = mysqli_num_rows($result);
+
 if (isset($_POST['submit'])) {
+    $region = $_POST['region'];
     $sql = "INSERT INTO sights(sights_name, sights_tel, sights_address, sights_intro)VALUES('" . $_POST["sights_name"] . "', '" . $_POST["sights_tel"] . "', '" . $_POST["sights_address"] . "',  '" . $_POST["sights_intro"] . "')";
     mysqli_query($con, $sql);
     if ($_FILES["up_photo"] != "") {
@@ -44,10 +51,10 @@ function resize_photo($src_file, $src_ext, $dest_name, $max_size)
     $src_h = imagesy($src);
     if ($src_w > $src_h) {
         $thumb_w = $max_size;
-        $thumb_h = intval($src_h / $src_w * $thumb_w);
+        $thumb_h = intval(256);
     } else {
         $thumb_h = $max_size;
-        $thumb_w = intval($src_w / $src_h * $thumb_h);
+        $thumb_w = intval(196);
     }
     $thumb = imagecreatetruecolor($thumb_w, $thumb_h);
     imagecopyresized($thumb, $src, 0, 0, 0, 0, $thumb_w, $thumb_h, $src_w, $src_h);
@@ -55,6 +62,7 @@ function resize_photo($src_file, $src_ext, $dest_name, $max_size)
     imagedestroy($src);
     imagedestroy($thumb);
 }
+
 ?>
 <html>
 
@@ -63,7 +71,6 @@ function resize_photo($src_file, $src_ext, $dest_name, $max_size)
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>新增景點 | 管理後台</title>
     <link rel="icon" href="../image/favicon.png" type="image/ico" />
-    <link rel="stylesheet" type="text/css" href="../css/style.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
     <link rel="stylesheet" href="../css/mdb.min.css">
@@ -86,7 +93,7 @@ function resize_photo($src_file, $src_ext, $dest_name, $max_size)
                         <?php if (isset($_SESSION['admin_id'])) { ?>
                             <li class="nav-item p-0"><a class="nav-link disabled">Hi, <?php echo $_SESSION['admin_name']; ?>!</a></li>
                         <?php } else  ?>
-                        <li class="nav-item p-0"> <a class="nav-link disabled" href="index.php">首頁</a> </li>
+                        <li class="nav-item p-0"> <a class="nav-link disabled" href="index.php">新增影點</a> </li>
                     </ul>
                 </div>
             </div>
@@ -98,44 +105,66 @@ function resize_photo($src_file, $src_ext, $dest_name, $max_size)
                 <form class="text-center p-5 col-md-6 offset-md-3" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post" enctype="multipart/form-data">
                     <h4 class="text-center card-title"><b>新增景點</b></h4>
                     <hr class="">
-                    <div class="form-group"><label for="name">☀景點名稱</label>
-                        <input type="text" name="sights_name" class="form-control mb-4" /></div>
-                    <div class="form-group"><label for="name">☀景點電話</label>
-                        <input type="text" name="sights_tel" class="form-control mb-4" /></div>
-                    <div class="form-group"><label for="name">☀景點地址</label>
-                        <input type="text" name="sights_address" class="form-control mb-4" /></div>
-                    <div class="form-group"><label for="name">☀景點hashtag</label>
-                        <input type="text" name="sights_hashtag" class="form-control mb-4" /></div>
-                    <div class="form-group"><label for="name">☀景點說明</label>
-                        <td colspan="3"><textarea name="sights_intro" cols="60" rows="6" class="form-control mb-4"></textarea></td>
-                        </tr>
-                        </table>
-                        <hr>
-                        <!-- upload image -->
-                        <div class="container2">
-                            <h3>上傳照片</h3>
-                            <div class="well" data-bind="fileDrag: multiFileData">
-                                <div class="form-group row">
-                                    <div class="col-md-6">
-                                        <!-- ko foreach: {data: multiFileData().dataURLArray, as: 'dataURL'} -->
-                                        <img style="height: 100px; margin: 5px;" class="btn btn-info btn-block my-4" data-bind="attr: { src: dataURL }, visible: dataURL">
-                                        <!-- /ko -->
-                                        <div data-bind="ifnot: fileData().dataURL">
-                                            <label class="drag-label">將照片拖到此處</label>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <input type="text" name="sights_name" class="form-control mb-4" placeholder="名稱"></div>
+                        <div class="form-group col-md-6">
+                            <input type="text" name="sights_tel" class="form-control mb-4" placeholder="景點電話"></div>
+                    </div>
+                    <div class="form-group">
+                        <div class="form-row">
+                            <div class="form-group col-md-3">
+                                <select name="region" class="form-control ">
+                                    <option value="" selected=selected disabled="true" required class="form-control">縣市</option>
+                                    <?php
+                                    while ($row = mysqli_fetch_assoc($result) and $j <= $total_records) {
+                                        echo "<option value='" . $row["region_id"] . "'> " . $row["region_name"];
+                                        $j++;
+                                    }
+                                    ?>
+                                </select>
+
+                            </div>
+
+                            <div class="form-group col-md-9">
+                                <input type="text" name="sights_address" class="form-control" placeholder="☀景點地址">
+                            </div>
+
+                        </div>
+                        <!--
+                        <div class="form-group"><label for="name">☀景點hashtag</label>
+                            <input type="text" name="sights_hashtag" class="form-control mb-4"></div>
+                        -->
+                        <div class="form-group"><label for="name">☀景點說明</label>
+                            <td colspan="3"><textarea name="sights_intro" cols="60" rows="6" class="form-control mb-4"></textarea></td>
+                            </tr>
+                            </table>
+                            <hr>
+                            <!-- upload image -->
+                            <div class="container2">
+                                <h3>上傳照片</h3>
+                                <div class="well" data-bind="fileDrag: multiFileData">
+                                    <div class="form-group row">
+                                        <div class="col-md-6">
+                                            <!-- ko foreach: {data: multiFileData().dataURLArray, as: 'dataURL'} -->
+                                            <img style="height: 100px; margin: 5px;" class="btn btn-info btn-block my-4" data-bind="attr: { src: dataURL }, visible: dataURL">
+                                            <!-- /ko -->
+                                            <div data-bind="ifnot: fileData().dataURL">
+                                                <label class="drag-label">將照片拖到此處</label>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <input name="up_photo[]" type="file" multiple data-bind="fileInput: multiFileData, customFileInput: {buttonClass: 'btn btn-success',fileNameClass: 'disabled form-control',onClear: onClear,}" accept="image/*">
+                                        <div class="col-md-6">
+                                            <input name="up_photo[]" type="file" multiple data-bind="fileInput: multiFileData, customFileInput: {buttonClass: 'btn btn-success',fileNameClass: 'disabled form-control',onClear: onClear,}" accept="image/*">
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <!-- upload image -->
+                            <!-- upload image -->
 
-                        <p>
-                            <input class="btn btn-info btn-block my-4" type="submit" name="submit" value="新增景點">
-                            <input class="btn btn-info btn-block my-4" type="button" name="button" value="回上一頁" onClick="window.history.back();">
-                        </p>
+                            <p>
+                                <input class="btn btn-info btn-block my-4" type="submit" name="submit" value="新增景點">
+                                <input class="btn btn-info btn-block my-4" type="button" name="button" value="回上一頁" onClick="window.history.back();">
+                            </p>
                 </form>
             </div>
         </div>
