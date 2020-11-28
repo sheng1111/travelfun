@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-include_once '../dbconnect.php';
+include '../dbconnect.php';
 
 $sql_region = "SELECT region_id,region_name";
 $sql_region .= " FROM region";
@@ -10,7 +10,7 @@ $total_records = mysqli_num_rows($result);
 
 if (isset($_POST['submit'])) {
     $region = $_POST['region'];
-    $sql = "INSERT INTO sights(sights_name, sights_tel, sights_address, sights_intro)VALUES('" . $_POST["sights_name"] . "', '" . $_POST["sights_tel"] . "', '" . $_POST["sights_address"] . "',  '" . $_POST["sights_intro"] . "')";
+    $sql = "INSERT INTO sights(sights_name, sights_tel, sights_address, sights_intro, region_id)VALUES('" . $_POST["sights_name"] . "', '" . $_POST["sights_tel"] . "', '" . $_POST["sights_address"] . "',  '" . $_POST["sights_intro"] . "',  '" . $region . "')";
     mysqli_query($con, $sql);
     if ($_FILES["up_photo"] != "") {
         $sights_id = mysqli_insert_id($con);
@@ -21,7 +21,7 @@ if (isset($_POST['submit'])) {
                 $src_ext = strtolower(strrchr($_FILES["up_photo"]["name"][$i], "."));
                 $desc_file_name = $desc . $src_ext;
                 $thumbnail_desc_file_name = "../thumbnail/$desc_file_name";
-                resize_photo($src_file, $src_ext, $thumbnail_desc_file_name, 200);
+                resize_photo($src_file, $src_ext, $thumbnail_desc_file_name, 256);
                 if (move_uploaded_file($_FILES["up_photo"]["tmp_name"][$i], "../photos/" . $desc_file_name)) {
                     $sql_photos = "INSERT INTO `photos` (sights_id, photos_files)";
                     $sql_photos .= "VALUES('$sights_id', '$desc_file_name')";
@@ -51,10 +51,10 @@ function resize_photo($src_file, $src_ext, $dest_name, $max_size)
     $src_h = imagesy($src);
     if ($src_w > $src_h) {
         $thumb_w = $max_size;
-        $thumb_h = intval(256);
+        $thumb_h = intval(196);
     } else {
         $thumb_h = $max_size;
-        $thumb_w = intval(196);
+        $thumb_w = intval(256);
     }
     $thumb = imagecreatetruecolor($thumb_w, $thumb_h);
     imagecopyresized($thumb, $src, 0, 0, 0, 0, $thumb_w, $thumb_h, $src_w, $src_h);
@@ -93,7 +93,7 @@ function resize_photo($src_file, $src_ext, $dest_name, $max_size)
                         <?php if (isset($_SESSION['admin_id'])) { ?>
                             <li class="nav-item p-0"><a class="nav-link disabled">Hi, <?php echo $_SESSION['admin_name']; ?>!</a></li>
                         <?php } else  ?>
-                        <li class="nav-item p-0"> <a class="nav-link disabled" href="index.php">新增影點</a> </li>
+                        <li class="nav-item p-0"> <a class="nav-link disabled" href="index.php">新增景點</a> </li>
                     </ul>
                 </div>
             </div>

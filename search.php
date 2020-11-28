@@ -11,10 +11,10 @@ if (isset($_POST['submit'])) {
     $word = $_POST['keyword'];
     if (empty($word)) {
         $id = $_POST['region_id'];
-        header("Location:region.php?region_id=$id");
+        header("Location:result.php?region_id=$id");
     } else {
         $searchmode = $_POST['searchmode'];
-        header("Location:result.php?sights_name=$word&searchmode=$searchmode");
+        header("Location:result.php?sights_name=$word&searchmode=1");
     }
 }
 ?>
@@ -98,14 +98,7 @@ if (isset($_POST['submit'])) {
 
                     <?php } else { ?>
                         <div class="form-group"><label for="name"> 關鍵字</label>
-                            <input type="text" name="keyword" class="form-control mb-4" /></div>
-                        <div class="form-group">
-                            <th>搜尋準度</th>
-                            <td>
-                                <label class="lb"><input type="radio" class="pr" value='0' name="searchmode" checked="checked" />精準</label>
-                                <label class="lb"><input type="radio" class="pr" value='1' name="searchmode" />概略</label>
-                            </td>
-                        </div>
+                            <input type="text" name="keyword" class="form-control mb-4" required></div>
                     <?php } ?>
                     <?php echo $mode_id; ?>
                     <span class="text-danger"><?php if (isset($messageerror)) echo $messageerror; ?></span>

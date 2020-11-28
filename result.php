@@ -28,7 +28,7 @@ if (!empty($_GET["region_id"])) {
     $id = $_GET["region_id"];
     $sql = "SELECT sights.sights_id, sights.sights_name,sights.sights_intro, photos.photos_files, count(photos.sights_id)";
     $sql .= " FROM sights, photos,region";
-    $sql .= " where sights.sights_region_id='" . $id . "' and region.region_id=sights.sights_region_id and sights.sights_id=photos.sights_id";
+    $sql .= " where sights.region_id='" . $id . "' and region.region_id=sights.region_id and sights.sights_id=photos.sights_id";
     $sql .= " GROUP BY sights.sights_id";
     $result = mysqli_query($con, $sql);
 }
@@ -123,11 +123,13 @@ if ($total_records != 0)
                             case 3:
                             case 4:
                             case 5:
-                                echo "<article class='vertical  card'>";
+                                echo "<article class='vertical card'>";
                                 break;
                             case 1:
-                            case 6:
                                 echo "<article class='horizontal card'>";
+                                break;
+                            case 6:
+                                echo "<article class='reverse-horizontal card'>";
                                 break;
                         }
                         //資料庫-景點內容
@@ -155,13 +157,13 @@ if ($total_records != 0)
                             echo "<font size='2' color='#ff0000' >刪除</font></a>";
                         }
                         //顯示標籤
-                        //echo "</div>";
-                        //echo " <div class='card__tags'>";
-                        //echo "<div class='tag'><i class='fa fa-tag'></i>test</div>";
-                        //echo "<div class='tag'><i class='fa fa-tag'></i>test</div>";
-                        //echo "</div>";
-                        //echo "</div>";
-                        //echo "</article>";
+                        echo "</div>";
+                        echo " <div class='card__tags'>";
+                        echo "<div class='tag'><i class='fa fa-tag'></i>test</div>";
+                        echo "<div class='tag'><i class='fa fa-tag'></i>test</div>";
+                        echo "</div>";
+                        echo "</div>";
+                        echo "</article>";
                         $j++;
                     }
                     ?>

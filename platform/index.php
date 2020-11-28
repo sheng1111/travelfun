@@ -44,7 +44,7 @@ if (isset($_POST['login'])) {
                         <?php if (isset($_SESSION['admin_id'])) { ?>
                             <li class="nav-item p-0"><a class="nav-link disabled">Hi, <?php echo $_SESSION['admin_name']; ?>!</a></li>
                         <?php } ?>
-                        <li class="nav-item p-0"> <a class="nav-link disabled" href="index.php">新增景點</a> </li>
+                        <li class="nav-item p-0"> <a class="nav-link disabled" href="index.php"></a> </li>
                         <!--<li class="nav-link p-0"> <a class="nav-link" href="addsight.php"><img src="../image/addsight.png" alt="新增景點" height="25" width="25"></a> </li>-->
 						<?php if (isset($_SESSION['admin_id'])) { ?>
 						<li class="nav-link p-0"> <a class="nav-link" href="logout.php"><img src="../image/logout.png" alt="登出" height="25" width="25"></a> </li>
