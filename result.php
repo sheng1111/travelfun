@@ -129,7 +129,7 @@ if ($total_records != 0)
                                 echo "<article class='horizontal card'>";
                                 break;
                             case 6:
-                                echo "<article class='reverse-horizontal card'>";
+                                echo "<article class='horizontal card'>";
                                 break;
                         }
                         //資料庫-景點內容

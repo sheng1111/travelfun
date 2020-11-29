@@ -100,7 +100,6 @@ if (isset($_POST['submit'])) {
                         <div class="form-group"><label for="name"> 關鍵字</label>
                             <input type="text" name="keyword" class="form-control mb-4" required></div>
                     <?php } ?>
-                    <?php echo $mode_id; ?>
                     <span class="text-danger"><?php if (isset($messageerror)) echo $messageerror; ?></span>
                     <center><button class="btn btn-info btn-block my-4" type="submit" name="submit">搜尋</button></center>
                 </form>
