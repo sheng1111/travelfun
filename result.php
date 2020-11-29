@@ -174,7 +174,7 @@ if ($total_records != 0)
                             <?php
                             //產生導覽列
                             echo "<p align='center'>";
-                            if ($page > 1)
+                            if ($total_pages > 1) {
                                 if (!empty($_GET["region_id"])) {
                                     $id = $_GET["region_id"];
                                     echo "<li class='page-item'><a class='page-link' href='result.php?region_id=$id&page=" . ($page - 1) . "'>上一頁</a> </li> ";
@@ -187,49 +187,49 @@ if ($total_records != 0)
                                     if ($page < $total_pages)
                                         echo "<li class='page-item'><a class='page-link' href='result.php?region_id=$id&page=" . ($page + 1) . "'>下一頁</a></li>";
                                     echo "</p>";
+                                } elseif (!empty($_GET["sights_name"])) {
+                                    $mode_id = $_GET['searchmode'];
+                                    $name = $_GET["sights_name"];
+                                    switch ($mode_id) {
+                                        case 0:
+                                            echo "<li class='page-item'><a class='page-link' href='result.php?sights_name=$name&searchmode=$mode_id&page=" . ($page - 1) . "'>上一頁</a> </li> ";
+                                            for ($i = 1; $i <= $total_pages; $i++) {
+                                                if ($i == $page)
+                                                    echo "<li class='page-item'><a class='page-link' >$i</a></li> ";
+                                                else
+                                                    echo "<li class='page-item'><a class='page-link' href='result.php?sights_name=$name&searchmode=$mode_id&page=$i'>$i</a></li> ";
+                                            }
+                                            if ($page < $total_pages)
+                                                echo "<li class='page-item'><a class='page-link' href='result.php?sights_name=$name&searchmode=$mode_id&page=" . ($page + 1) . "'>下一頁</a></li>";
+                                            echo "</p>";
+                                            break;
+                                        case 1:
+                                            echo "<li class='page-item'><a class='page-link' href='result.php?sights_name=$name&searchmode=$mode_id&page=" . ($page - 1) . "'>上一頁</a> </li> ";
+                                            for ($i = 1; $i <= $total_pages; $i++) {
+                                                if ($i == $page)
+                                                    echo "<li class='page-item'><a class='page-link' >$i</a></li> ";
+                                                else
+                                                    echo "<li class='page-item'><a class='page-link' href='result.php?sights_name=$name&searchmode=$mode_id&page=$i'>$i</a></li> ";
+                                            }
+                                            if ($page < $total_pages)
+                                                echo "<li class='page-item'><a class='page-link' href='result.php?sights_name=$name&searchmode=$mode_id&page=" . ($page + 1) . "'>下一頁</a></li>";
+                                            echo "</p>";
+                                            break;
+                                    }
+                                } else {
+                                    if ($total_records != 0) {
+                                        echo "<li class='page-item'><a class='page-link' href='result.php?page=" . ($page - 1) . "'>上一頁</a> </li> ";
+                                    }
+                                    for ($i = 1; $i <= $total_pages; $i++) {
+                                        if ($i == $page)
+                                            echo "<li class='page-item'><a class='page-link' >$i</a></li> ";
+                                        else
+                                            echo "<li class='page-item'><a class='page-link' href='result.php?page=$i'>$i</a></li> ";
+                                    }
+                                    if ($page < $total_pages)
+                                        echo "<li class='page-item'><a class='page-link' href='result.php?page=" . ($page + 1) . "'>下一頁</a></li>";
+                                    echo "</p>";
                                 }
-                            if (!empty($_GET["sights_name"])) {
-                                $mode_id = $_GET['searchmode'];
-                                $name = $_GET["sights_name"];
-                                switch ($mode_id) {
-                                    case 0:
-                                        echo "<li class='page-item'><a class='page-link' href='result.php?sights_name=$name&searchmode=$mode_id&page=" . ($page - 1) . "'>上一頁</a> </li> ";
-                                        for ($i = 1; $i <= $total_pages; $i++) {
-                                            if ($i == $page)
-                                                echo "<li class='page-item'><a class='page-link' >$i</a></li> ";
-                                            else
-                                                echo "<li class='page-item'><a class='page-link' href='result.php?sights_name=$name&searchmode=$mode_id&page=$i'>$i</a></li> ";
-                                        }
-                                        if ($page < $total_pages)
-                                            echo "<li class='page-item'><a class='page-link' href='result.php?sights_name=$name&searchmode=$mode_id&page=" . ($page + 1) . "'>下一頁</a></li>";
-                                        echo "</p>";
-                                        break;
-                                    case 1:
-                                        echo "<li class='page-item'><a class='page-link' href='result.php?sights_name=$name&searchmode=$mode_id&page=" . ($page - 1) . "'>上一頁</a> </li> ";
-                                        for ($i = 1; $i <= $total_pages; $i++) {
-                                            if ($i == $page)
-                                                echo "<li class='page-item'><a class='page-link' >$i</a></li> ";
-                                            else
-                                                echo "<li class='page-item'><a class='page-link' href='result.php?sights_name=$name&searchmode=$mode_id&page=$i'>$i</a></li> ";
-                                        }
-                                        if ($page < $total_pages)
-                                            echo "<li class='page-item'><a class='page-link' href='result.php?sights_name=$name&searchmode=$mode_id&page=" . ($page + 1) . "'>下一頁</a></li>";
-                                        echo "</p>";
-                                        break;
-                                }
-                            } else {
-                                if ($total_records != 0) {
-                                    echo "<li class='page-item'><a class='page-link' href='result.php?page=" . ($page - 1) . "'>上一頁</a> </li> ";
-                                }
-                                for ($i = 1; $i <= $total_pages; $i++) {
-                                    if ($i == $page)
-                                        echo "<li class='page-item'><a class='page-link' >$i</a></li> ";
-                                    else
-                                        echo "<li class='page-item'><a class='page-link' href='result.php?page=$i'>$i</a></li> ";
-                                }
-                                if ($page < $total_pages)
-                                    echo "<li class='page-item'><a class='page-link' href='result.php?page=" . ($page + 1) . "'>下一頁</a></li>";
-                                echo "</p>";
                             }
                             ?>
 
