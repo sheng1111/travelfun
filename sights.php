@@ -6,9 +6,8 @@ $result_sights = mysqli_query($con, $sql_sights);
 $row_sights = mysqli_fetch_assoc($result_sights);
 //取縣市名稱
 $region_id = $row_sights["region_id"];
-$sql_region = "SELECT * FROM region where region_id ='" .$region_id . "'";
+$sql_region = "SELECT * FROM region where region_id ='" . $region_id . "'";
 $row_region = mysqli_fetch_assoc(mysqli_query($con, $sql_region));
-
 //取照片
 $sql_photo = "SELECT * FROM photos where sights_id ='" . $_GET["sights_id"] . "'";
 $result_photo = mysqli_query($con, $sql_photo);
@@ -44,7 +43,6 @@ if ($total_records != 0)
     <link rel="stylesheet" href="css/mdb.min.css">
     <link rel="icon" href="image/favicon.png" type="image/ico" />
     <link rel="stylesheet" href="css/style.css">
-
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
 
 </head>
@@ -98,15 +96,24 @@ if ($total_records != 0)
                     <tr>
                         <td colspan="2" align="center" valign="top">
                             <?php
-                            echo "<p><B>地址：</B><a href='https://www.google.com.tw/maps/place/"  .$row_region["region_name"] .$row_sights["sights_address"] . "'>" .$row_region["region_name"] .$row_sights["sights_address"] . "</a> </p>";
-                            echo "<B>電話：</B>" . $row_sights["sights_tel"] . "</p>";
+                            echo "<p><B>地址：</B><a href='https://www.google.com.tw/maps/place/"  . $row_region["region_name"] . $row_sights["sights_address"] . "'>" . $row_region["region_name"] . $row_sights["sights_address"] . "</a> </p>";
+                            echo "<B>電話：</B><a href='tel:" . $row_sights['sights_tel'] . "'>" . $row_sights['sights_tel'] . " </a></p>";
                             //echo "<B>HashTag：</B>" . $row_sights["sights_hashtag"] . "</p>";
                             echo "<B>景點介紹：</B>" . $row_sights["sights_intro"] . "</p>";
                             echo "<B>相片總數：</B>" . $total_records . "張</p>";
                             ?>
+
                         </td>
                     </tr>
                     <hr class="">
+                    <tr>
+                        <div align="center">
+                            <a title="facebook 點選開啟新視窗"  href="javascript: void(window.open(&#39;http://www.facebook.com/share.php?u=&#39;+encodeURIComponent(location.href)+&#39;&amp;t=&#39;+encodeURIComponent(document.title)));"> <img src="image/facebook.png"width="35" height="35"></a>
+                            <a title="twitter 點選開啟新視窗"  href="javascript: void(window.open(&#39;http://twitter.com/home/?status=&#39;.concat(encodeURIComponent(document.title)) .concat(&#39; &#39;) .concat(encodeURIComponent(location.href))));"><img src="image/twitter.png"width="35" height="35"></a>
+                            <a title="plurk 點選開啟新視窗"  href="javascript: void(window.open(&#39;http://www.plurk.com/?qualifier=shares&amp;status=&#39; .concat(encodeURIComponent(location.href)) .concat(&#39; &#39;) .concat(&#39;(&#39;) .concat(encodeURIComponent(document.title)) .concat(&#39;)&#39;)));"><img src="image/plurk.png"width="35" height="35"></a>
+                            <a title="line 點選開啟新視窗"  href="javascript: void(window.open(&#39;http://line.me/R/msg/text/?&#39;.concat(encodeURIComponent(document.title + &#39;%97&#39;)).concat(encodeURIComponent(location.href)) ));"><img src="image/line.png"width="35" height="35"> </a>
+                        </div>
+                    </tr>
                     <tr>
                         <td colspan="2" align="center" valign="top">
                             <?php

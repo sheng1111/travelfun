@@ -26,8 +26,9 @@ if (isset($_POST['submit'])) {
                     $sql_photos = "INSERT INTO `photos` (sights_id, photos_files)";
                     $sql_photos .= "VALUES('$sights_id', '$desc_file_name')";
                     mysqli_query($con, $sql_photos);
+                    $successmsg ="新增資料成功";
                 } else {
-                    echo "檔案上傳失敗!";
+                    $errormsg = "新增資料失敗";
                 }
             }
         }
@@ -77,6 +78,7 @@ function resize_photo($src_file, $src_ext, $dest_name, $max_size)
 
     <link rel='stylesheet' href='https://rawgit.com/adrotec/knockout-file-bindings/master/knockout-file-bindings.css'>
     <link rel="stylesheet" href="../css/addsight.css">
+    <script src="https://cdn.ckeditor.com/4.15.1/standard/ckeditor.js"></script>
 
 </head>
 
@@ -109,13 +111,13 @@ function resize_photo($src_file, $src_ext, $dest_name, $max_size)
                         <div class="form-group col-md-6">
                             <input type="text" name="sights_name" class="form-control mb-4" placeholder="名稱"></div>
                         <div class="form-group col-md-6">
-                            <input type="text" name="sights_tel" class="form-control mb-4" placeholder="景點電話"></div>
+                            <input type="number" name="sights_tel" oninput = "value=value.replace(/[^\d]/g,'')" class="form-control mb-4" placeholder="景點電話"></div>
                     </div>
                     <div class="form-group">
                         <div class="form-row">
                             <div class="form-group col-md-3">
                                 <select name="region" class="form-control ">
-                                    <option value="" selected=selected disabled="true" required class="form-control">縣市</option>
+                                    <option  selected=selected disabled="true" required class="form-control">縣市</option>
                                     <?php
                                     while ($row = mysqli_fetch_assoc($result) and $j <= $total_records) {
                                         echo "<option value='" . $row["region_id"] . "'> " . $row["region_name"];
@@ -136,7 +138,7 @@ function resize_photo($src_file, $src_ext, $dest_name, $max_size)
                             <input type="text" name="sights_hashtag" class="form-control mb-4"></div>
                         -->
                         <div class="form-group"><label for="name">☀景點說明</label>
-                            <td colspan="3"><textarea name="sights_intro" cols="60" rows="6" class="form-control mb-4"></textarea></td>
+                        <textarea name="sights_intro"></textarea><script>CKEDITOR.replace( 'sights_intro' );</script>
                             </tr>
                             </table>
                             <hr>
@@ -160,7 +162,6 @@ function resize_photo($src_file, $src_ext, $dest_name, $max_size)
                                 </div>
                             </div>
                             <!-- upload image -->
-
                             <p>
                                 <input class="btn btn-info btn-block my-4" type="submit" name="submit" value="新增景點">
                                 <input class="btn btn-info btn-block my-4" type="button" name="button" value="回上一頁" onClick="window.history.back();">
@@ -182,6 +183,5 @@ function resize_photo($src_file, $src_ext, $dest_name, $max_size)
     <script src='https://cdnjs.cloudflare.com/ajax/libs/knockout/3.1.0/knockout-min.js'></script>
     <script type="text/javascript" src="../js//knockout-file-bindings.js"></script>
     <script type="text/javascript" src="../js/addsight.js"></script>
-</body>
-
+</body> 
 </html>
