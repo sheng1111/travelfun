@@ -1,26 +1,45 @@
 <?php
 session_start();
 include_once 'dbconnect.php';
-//include_once 'verification.php';
-$sql = "SELECT region_id,region_name";
-$sql .= " FROM region";
-$result = mysqli_query($con, $sql);
-//取得記錄數
-$total_records = mysqli_num_rows($result);
+
 if (isset($_POST['submit'])) {
+    $kind =  $_POST['choose'];
+    $kind1 =  $_POST['choose1'];
     $word = $_POST['keyword'];
-    if (empty($word)) {
-        $id = $_POST['region_id'];
-        header("Location:result.php?region_id=$id");
-    } else {
-        $searchmode = $_POST['searchmode'];
-        header("Location:result.php?sights_name=$word&searchmode=1");
+    switch($kind){
+     case 1 :
+        $check = "SELECT * FROM `ig_sights` WHERE view_name like '%$word%'";
+                    $chresult = mysqli_query($con, $check);
+                    $row2 = mysqli_fetch_assoc($chresult);
+                    $checkrow = $row2["view_id"];
+                    if (empty($checkrow)) {
+                        $error = true;
+                        $messageerror = "查無景點!";
+                    }
+                    if (!$error) {
+                        header("Location:result.php?keyword=$word");
+                    }
+                    break;
+                case 2:
+                    $check = "SELECT * FROM `ig_sights` WHERE tag_area like '%$word%'";
+                    $chresult = mysqli_query($con, $check);
+                    $row2 = mysqli_fetch_assoc($chresult);
+                    $checkrow = $row2["view_id"];
+                    if (empty($checkrow)) {
+                        $error = true;
+                        $messageerror = "查無景點!";
+                    }
+                    if (!$error) {
+                        header("Location:result.php?tagname=$word");
+                    }
+
+                    break;
+                }
     }
-}
+
 ?>
 <!DOCTYPE html>
 <html>
-
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -36,7 +55,7 @@ if (isset($_POST['submit'])) {
 </head>
 
 <body>
-    <header>
+<header>
         <nav class="navbar navbar-expand-lg navbar-dark fixed-top unique-color">
             <div class="container">
                 <a class="navbar-brand" href="index.php"><strong>Travel Fun</strong></a>
@@ -48,19 +67,29 @@ if (isset($_POST['submit'])) {
                         <?php if (isset($_SESSION['user_id'])) { ?>
                             <li class="nav-item p-0"><a class="nav-link disabled">Hi, <?php echo $_SESSION['user_name']; ?>!</a></li>
                         <?php } else  ?>
-                        <li class="nav-item p-0"> <a class="nav-link disabled" href="index.php">首頁</a> </li>
-                        <li class="nav-link p-0"> <a class="nav-link" href="404.html"><img src="image/itinerary.png" alt="itineray" height="25" width="25"></a> </li>
-                        <li class="nav-link p-0"> <a class="nav-link" href="search.php"><img src="image/search.png" alt="search" height="25" width="25"></a> </li>
+                        <li class="nav-link p-0"> <a class="nav-link" href="search.php"><img src="image/search.png" alt="搜尋" height="25" width="25"></a> </li>
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink-333" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img src="image/login.png" alt="login" height="25" width="25">
-                            </a>
+                            <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink-333" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img src="image/all.png" alt="總覽" height="25" width="25"></a>
+                            <div class="dropdown-menu dropdown-menu-right dropdown-default" aria-labelledby="navbarDropdownMenuLink-333">
+                                <a class="dropdown-item" href="tag.php">📁分類</a>
+                                <a class="dropdown-item" href="result.php">🚩景點</a>
+                                <a class="dropdown-item" href="itineraries.php">🧾行程</a>
+                            </div>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink-333" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img src="image/login.png" alt="login" height="25" width="25"></a>
                             <div class="dropdown-menu dropdown-menu-right dropdown-default" aria-labelledby="navbarDropdownMenuLink-333">
                                 <?php if (isset($_SESSION['user_id'])) { ?>
-                                    <a class="dropdown-item" href="update.php">修改個資</a>
+                                    <a class="dropdown-item" href="membercentre/manageFavorites.php">❤收藏</a>
+                                    <a class="dropdown-item" href="membercentre/manageitinerary.php">🧾行程</a>
+                                    <a class="dropdown-item" href="membercentre/modifyindividual.php">🔩設定</a>
+                                    <a class="dropdown-item" href="about.php">👱關於我</a>
+                                    <?php if ($_SESSION['Authority'] == 2) {
+                                        echo "<a class='dropdown-item' href='platform/index.php'>💻管理員介面</a>";
+                                    } ?>
                                     <a class="dropdown-item" href="logout.php">登出</a>
                                 <?php } else { ?>
-                                    <a class="dropdown-item" href="login.php">登入</a>
-                                    <a class="dropdown-item" href="register.php">註冊</a>
+                                    <a class="dropdown-item" href="login.php">📲登入</a>
+                                    <a class="dropdown-item" href="register.php">📋註冊</a>
                                 <?php } ?>
                             </div>
                         </li>
@@ -69,37 +98,17 @@ if (isset($_POST['submit'])) {
             </div>
         </nav>
     </header>
+
     <main>
         <div class="py-md-5">
             <div class="container">
                 <form class="p-5 col-md-6 offset-md-3" role="form" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post" name="searchform">
                     <h4 class="text-center card-title"><b>搜尋</b></h4>
-                    <div class="btn-group" role="group" aria-label="Basic example">
-                        <label>
-                            <button type="button" name="choosemode" onclick="javascript:location.href='search.php'" class="btn btn-info btn-lg">關鍵字搜尋 <i class="fas fa-magic ml-1"></i></button>
-                        </label>
-                        <label>
-                            <button type="button" name="choosemode" onclick="javascript:location.href='search.php?choosemode=area'" class="btn btn-info btn-lg">地區搜尋 <i class="fas fa-magic ml-1"></i></button>.
-                        </label>
+                    <div class="form-group">
+                        <label for="name"> 關鍵字</label>
+                        <input type="text" name="keyword" class="form-control mb-4" required>
                     </div>
-                    <?php if (isset($_GET['choosemode'])) { ?>
-
-                        <div class="form-group"><label for="name"> 地區搜尋</label>
-                            <select name="region_id">
-                                <option value="" selected=selected disabled="true" required class="form-control">請選擇地區</option>
-                                <?php
-                                while ($row = mysqli_fetch_assoc($result) and $j <= $total_records) {
-                                    echo "<option value='" . $row["region_id"] . "'> " . $row["region_name"];
-                                    $j++;
-                                }
-                                ?>
-                            </select>
-                        </div>
-
-                    <?php } else { ?>
-                        <div class="form-group"><label for="name"> 關鍵字</label>
-                            <input type="text" name="keyword" class="form-control mb-4" required></div>
-                    <?php } ?>
+                    <input type="hidden" name="choose" value=1>
                     <span class="text-danger"><?php if (isset($messageerror)) echo $messageerror; ?></span>
                     <center><button class="btn btn-info btn-block my-4" type="submit" name="submit">搜尋</button></center>
                 </form>
@@ -107,14 +116,17 @@ if (isset($_POST['submit'])) {
         </div>
     </main>
 
-    <footer class="page-footer font-small unique-color fixed-bottom">
+	<footer class="page-footer font-small unique-color fixed-bottom">
         <div class="footer-copyright text-center py-3">© 2020 Copyright: Travel Fun</div>
     </footer>
 
     <script type="text/javascript" src="js/mdb.min.js"></script>
+    <script type="text/javascript" src="js/jquery-2.2.0.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js" integrity="sha256-T0Vest3yCU7pafRw9r+settMBX6JkKN06dqBnpQ8d30=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
 </body>
 
 </html>

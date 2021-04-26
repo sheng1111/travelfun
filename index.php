@@ -1,6 +1,14 @@
 <?php
 session_start();
 include_once 'dbconnect.php';
+//檢查管理員權限
+if (isset($_SESSION['user_id'])) {
+    $user_id = $_SESSION['user_id'];
+    $check = "SELECT `Authority` FROM `user` WHERE `user_id` ='" . $user_id . "'";
+    $chresult = mysqli_query($con, $check);
+    $row2 = mysqli_fetch_assoc($chresult);
+    $_SESSION['Authority'] = $row2["Authority"];
+}
 ?>
 <!DOCTYPE html>
 <html>
@@ -32,19 +40,29 @@ include_once 'dbconnect.php';
                         <?php if (isset($_SESSION['user_id'])) { ?>
                             <li class="nav-item p-0"><a class="nav-link disabled">Hi, <?php echo $_SESSION['user_name']; ?>!</a></li>
                         <?php } else  ?>
-                        <li class="nav-item p-0"> <a class="nav-link disabled" href="index.php">首頁</a> </li>
-                        <li class="nav-link p-0"> <a class="nav-link" href="404.html"><img src="image/itinerary.png" alt="itineray" height="25" width="25"></a> </li>
-                        <li class="nav-link p-0"> <a class="nav-link" href="search.php"><img src="image/search.png" alt="search" height="25" width="25"></a> </li>
+                        <li class="nav-link p-0"> <a class="nav-link" href="search.php"><img src="image/search.png" alt="搜尋" height="25" width="25"></a> </li>
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink-333" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img src="image/login.png" alt="login" height="25" width="25">
-                            </a>
+                            <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink-333" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img src="image/all.png" alt="總覽" height="25" width="25"></a>
+                            <div class="dropdown-menu dropdown-menu-right dropdown-default" aria-labelledby="navbarDropdownMenuLink-333">
+                                <a class="dropdown-item" href="tag.php">📁分類</a>
+                                <a class="dropdown-item" href="result.php">🚩景點</a>
+                                <a class="dropdown-item" href="itineraries.php">🧾行程</a>
+                            </div>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink-333" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img src="image/login.png" alt="login" height="25" width="25"></a>
                             <div class="dropdown-menu dropdown-menu-right dropdown-default" aria-labelledby="navbarDropdownMenuLink-333">
                                 <?php if (isset($_SESSION['user_id'])) { ?>
-                                    <a class="dropdown-item" href="update.php">修改個資</a>
+                                    <a class="dropdown-item" href="membercentre/manageFavorites.php">❤收藏</a>
+                                    <a class="dropdown-item" href="membercentre/manageitinerary.php">🧾行程</a>
+                                    <a class="dropdown-item" href="membercentre/modifyindividual.php">🔩設定</a>
+                                    <a class="dropdown-item" href="about.php">👱關於我</a>
+                                    <?php if ($_SESSION['Authority'] == 2) {
+                                        echo "<a class='dropdown-item' href='platform/index.php'>💻管理員介面</a>";
+                                    } ?>
                                     <a class="dropdown-item" href="logout.php">登出</a>
                                 <?php } else { ?>
-                                    <a class="dropdown-item" href="login.php">登入</a>
-                                    <a class="dropdown-item" href="register.php">註冊</a>
+                                    <a class="dropdown-item" href="login.php">📲登入</a>
+                                    <a class="dropdown-item" href="register.php">📋註冊</a>
                                 <?php } ?>
                             </div>
                         </li>

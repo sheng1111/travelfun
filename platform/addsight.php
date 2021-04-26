@@ -1,70 +1,29 @@
 <?php
 session_start();
-
 include '../dbconnect.php';
-
-$sql_region = "SELECT region_id,region_name";
-$sql_region .= " FROM region";
-$result = mysqli_query($con, $sql_region);
-$total_records = mysqli_num_rows($result);
-
 if (isset($_POST['submit'])) {
-    $region = $_POST['region'];
-    $sql = "INSERT INTO sights(sights_name, sights_tel, sights_address, sights_intro, region_id)VALUES('" . $_POST["sights_name"] . "', '" . $_POST["sights_tel"] . "', '" . $_POST["sights_address"] . "',  '" . $_POST["sights_intro"] . "',  '" . $region . "')";
-    mysqli_query($con, $sql);
-    if ($_FILES["up_photo"] != "") {
-        $sights_id = mysqli_insert_id($con);
-        for ($i = 0; $i < count($_FILES["up_photo"]); $i++) {
-            if ($_FILES["up_photo"]["tmp_name"][$i] != "") {
-                $src_file = $_FILES["up_photo"]["tmp_name"][$i];
-                $desc = uniqid();
-                $src_ext = strtolower(strrchr($_FILES["up_photo"]["name"][$i], "."));
-                $desc_file_name = $desc . $src_ext;
-                $thumbnail_desc_file_name = "../thumbnail/$desc_file_name";
-                resize_photo($src_file, $src_ext, $thumbnail_desc_file_name, 256);
-                if (move_uploaded_file($_FILES["up_photo"]["tmp_name"][$i], "../photos/" . $desc_file_name)) {
-                    $sql_photos = "INSERT INTO `photos` (sights_id, photos_files)";
-                    $sql_photos .= "VALUES('$sights_id', '$desc_file_name')";
-                    mysqli_query($con, $sql_photos);
-                    $successmsg ="新增資料成功";
-                } else {
-                    $errormsg = "新增資料失敗";
-                }
-            }
-        }
-    }
-    //header("location:index.php");
+    $insertsql = "INSERT INTO ig_sights(`view_name`, `shortcode`, `timestamp`, `tag_area`,`status`)VALUES('" . $_POST["name"] . "', '" . $_POST["code"] . "', '" . strtotime($_POST["timestamp"]) . "',  '" . $_POST["tag"] . "','1')";
+    if(mysqli_query($con, $insertsql))
+    {header("Location:managesight.php");}
+    else
+    {echo " <script> alert(新增失敗!);</script>";}
 }
-function resize_photo($src_file, $src_ext, $dest_name, $max_size)
-{
-    switch ($src_ext) {
-        case ".jpg":
-            $src = imagecreatefromjpeg($src_file);
-            break;
-        case ".png":
-            $src = imagecreatefrompng($src_file);
-            break;
-        case ".gif":
-            $src = imagecreatefromgif($src_file);
-            break;
-    }
-    $src_w = imagesx($src);
-    $src_h = imagesy($src);
-    if ($src_w > $src_h) {
-        $thumb_w = $max_size;
-        $thumb_h = intval(196);
-    } else {
-        $thumb_h = $max_size;
-        $thumb_w = intval(256);
-    }
-    $thumb = imagecreatetruecolor($thumb_w, $thumb_h);
-    imagecopyresized($thumb, $src, 0, 0, 0, 0, $thumb_w, $thumb_h, $src_w, $src_h);
-    imagejpeg($thumb, $dest_name, 100);
-    imagedestroy($src);
-    imagedestroy($thumb);
+//使用者登入情況下可自動賦予管理權限
+if (isset($_SESSION['user_id'])) {
+	$sql="SELECT Authority FROM user WHERE user_id = '" . $_SESSION["user_id"]. "'";
+	$result = mysqli_query($con, $sql);
+	$row = mysqli_fetch_assoc($result);
+	if (!empty($row)) {
+		$_SESSION['Authority'] = $row['Authority'];
+		//顯示主功能頁面
+	} else
+	{header("Location:../index.php");}
+} else {
+	header("Location: ../login.php");
 }
 
 ?>
+
 <html>
 
 <head>
@@ -75,32 +34,32 @@ function resize_photo($src_file, $src_ext, $dest_name, $max_size)
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
     <link rel="stylesheet" href="../css/mdb.min.css">
-
     <link rel='stylesheet' href='https://rawgit.com/adrotec/knockout-file-bindings/master/knockout-file-bindings.css'>
     <link rel="stylesheet" href="../css/addsight.css">
-    <script src="https://cdn.ckeditor.com/4.15.1/standard/ckeditor.js"></script>
 
 </head>
 
 <body>
-    <header>
-        <nav class="navbar navbar-expand-lg navbar-dark fixed-top unique-color">
-            <div class="container">
-                <a class="navbar-brand" href="index.php"><strong>管理員介面</strong></a>
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
-                    <ul class="navbar-nav">
-                        <?php if (isset($_SESSION['admin_id'])) { ?>
-                            <li class="nav-item p-0"><a class="nav-link disabled">Hi, <?php echo $_SESSION['admin_name']; ?>!</a></li>
-                        <?php } else  ?>
-                        <li class="nav-item p-0"> <a class="nav-link disabled" href="index.php">新增景點</a> </li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
-    </header>
+<header>
+		<nav class="navbar navbar-expand-lg navbar-dark fixed-top stylish-color-dark">
+			<div class="container">
+				<a class="navbar-brand" href="index.php"><strong>Travel Fun</strong></a>
+				<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+					<span class="navbar-toggler-icon"></span>
+				</button>
+				<div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
+					<ul class="navbar-nav">
+						<?php if (isset($_SESSION['user_id'])) { ?>
+							<li class="nav-item p-0"><a class="nav-link disabled">Hi, <?php echo $_SESSION['user_name']; ?>!</a></li>
+						<?php } else  ?>
+            <li class="nav-link p-0"> <a class="nav-link" href="index.php"><img src="../image/home.png" alt="目錄" height="25" width="25"></a> </li>
+            <li class="nav-link p-0"> <a class="nav-link" href="../index.php"><img src="../image/return.png" alt="返回使用者介面" height="25" width="25"></a> </li>
+						<li class="nav-link p-0"> <a class="nav-link" href="../logout.php"><img src="../image/logout.png" alt="登出" height="25" width="25"></a> </li>
+					</ul>
+				</div>
+			</div>
+		</nav>
+</header>
     <main>
         <div class="py-md-5">
             <div class="container">
@@ -108,80 +67,51 @@ function resize_photo($src_file, $src_ext, $dest_name, $max_size)
                     <h4 class="text-center card-title"><b>新增景點</b></h4>
                     <hr class="">
                     <div class="form-row">
-                        <div class="form-group col-md-6">
-                            <input type="text" name="sights_name" class="form-control mb-4" placeholder="名稱"></div>
-                        <div class="form-group col-md-6">
-                            <input type="number" name="sights_tel" oninput = "value=value.replace(/[^\d]/g,'')" class="form-control mb-4" placeholder="景點電話"></div>
-                    </div>
-                    <div class="form-group">
-                        <div class="form-row">
-                            <div class="form-group col-md-3">
-                                <select name="region" class="form-control ">
-                                    <option  selected=selected disabled="true" required class="form-control">縣市</option>
-                                    <?php
-                                    while ($row = mysqli_fetch_assoc($result) and $j <= $total_records) {
-                                        echo "<option value='" . $row["region_id"] . "'> " . $row["region_name"];
-                                        $j++;
-                                    }
-                                    ?>
-                                </select>
-
-                            </div>
-
-                            <div class="form-group col-md-9">
-                                <input type="text" name="sights_address" class="form-control" placeholder="☀景點地址">
-                            </div>
-
+                        <div class="form-group col-md-8">
+                            <input type="text" name="name" class="form-control mb-4" placeholder="景點名稱" required>
                         </div>
-                        <!--
-                        <div class="form-group"><label for="name">☀景點hashtag</label>
-                            <input type="text" name="sights_hashtag" class="form-control mb-4"></div>
-                        -->
-                        <div class="form-group"><label for="name">☀景點說明</label>
-                        <textarea name="sights_intro"></textarea><script>CKEDITOR.replace( 'sights_intro' );</script>
-                            </tr>
-                            </table>
-                            <hr>
-                            <!-- upload image -->
-                            <div class="container2">
-                                <h3>上傳照片</h3>
-                                <div class="well" data-bind="fileDrag: multiFileData">
-                                    <div class="form-group row">
-                                        <div class="col-md-6">
-                                            <!-- ko foreach: {data: multiFileData().dataURLArray, as: 'dataURL'} -->
-                                            <img style="height: 100px; margin: 5px;" class="btn btn-info btn-block my-4" data-bind="attr: { src: dataURL }, visible: dataURL">
-                                            <!-- /ko -->
-                                            <div data-bind="ifnot: fileData().dataURL">
-                                                <label class="drag-label">將照片拖到此處</label>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <input name="up_photo[]" type="file" multiple data-bind="fileInput: multiFileData, customFileInput: {buttonClass: 'btn btn-success',fileNameClass: 'disabled form-control',onClear: onClear,}" accept="image/*">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- upload image -->
+                        <div class="form-group col-md-8">
+                            <input type="text" name="code"  class="form-control mb-4" placeholder="貼文代碼" required>
+                        </div>
+                        <div class="form-group col-md-8">
+                            <input type="text" name="timestamp"  class="input is-large date_hour form-control mb-4" placeholder="發文時間(0000/00/00 00:00:00)" required>
+                        </div>
+                        <div class="form-group col-md-8">
+                            <input type="text" name="tag" class="form-control mb-4" placeholder="發文地點" required>
+                        </div>
+                        </div>
                             <p>
-                                <input class="btn btn-info btn-block my-4" type="submit" name="submit" value="新增景點">
-                                <input class="btn btn-info btn-block my-4" type="button" name="button" value="回上一頁" onClick="window.history.back();">
+                            <center><input class="btn btn-info btn-block my-4 btn-lg" type="submit" name="submit" value="新增景點"></center>
+                            <center><input class="btn btn-info btn-block my-4 btn-lg" type="button" name="button" value="回上一頁" onClick="location.href='managesight.php'"></center>
                             </p>
                 </form>
             </div>
         </div>
     </main>
 
-    <footer class="page-footer font-small unique-color fixed-bottom">
-        <div class="footer-copyright text-center py-3">© 2020 Copyright: Travel Fun</div>
-    </footer>
+	<footer class="page-footer font-small stylish-color-dark fixed-bottom">
+		<div class="footer-copyright text-center py-3">© 2020 Copyright: Travel Fun</div>
+	</footer>
 
     <script type="text/javascript" src="../js/mdb.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
-
     <script src='https://cdnjs.cloudflare.com/ajax/libs/knockout/3.1.0/knockout-min.js'></script>
     <script type="text/javascript" src="../js//knockout-file-bindings.js"></script>
     <script type="text/javascript" src="../js/addsight.js"></script>
-</body> 
+    <script src="../js/jquery.samask-masker.js"></script>
+	<script>
+	      $(function() {
+	        $.samaskHtml();
+	        $('.phone').samask("(0000)000-0000");
+	        $('.hour').samask("00:00:00");
+	        $('.date').samask("00/00/0000");
+	        $('.date_hour').samask("0000/00/00 00:00:00");
+	        $('.ip_address').samask("000.000.000.000");
+	        $('.percent').samask("%00");
+	        $('.mixed').samask("SSS-000");
+	      });
+	    </script>
+</body>
 </html>
