@@ -1,14 +1,18 @@
 <?php
 session_start();
 include_once 'dbconnect.php';
-
+include 'function.php';
 if (isset($_POST['submit'])) {
     $kind =  $_POST['choose'];
     $kind1 =  $_POST['choose1'];
+    $sourcekind= $_POST['source'];
     $word = $_POST['keyword'];
+    if($facebookswitch!=1){
+    //(舊功能)尋找景點關鍵字
+    $kind=1;//預設選項為關鍵字
     switch($kind){
      case 1 :
-        $check = "SELECT * FROM `ig_sights` WHERE view_name like '%$word%'";
+        $check = "SELECT * FROM `sight` WHERE view_name like '%$word%'";
                     $chresult = mysqli_query($con, $check);
                     $row2 = mysqli_fetch_assoc($chresult);
                     $checkrow = $row2["view_id"];
@@ -21,7 +25,7 @@ if (isset($_POST['submit'])) {
                     }
                     break;
                 case 2:
-                    $check = "SELECT * FROM `ig_sights` WHERE tag_area like '%$word%'";
+                    $check = "SELECT * FROM `sight` WHERE tag_area like '%$word%'";
                     $chresult = mysqli_query($con, $check);
                     $row2 = mysqli_fetch_assoc($chresult);
                     $checkrow = $row2["view_id"];
@@ -35,6 +39,53 @@ if (isset($_POST['submit'])) {
 
                     break;
                 }
+            }
+    else{
+    //當$facebookswitch=1時
+    switch($sourcekind){
+     case "FaceBook":
+        $sourcesql=" and source=1";
+        $check = "SELECT * FROM `sight` WHERE status=1 ".$sourcesql." and view_name like '%$word%'";
+        $chresult = mysqli_query($con, $check);
+        $row2 = mysqli_fetch_assoc($chresult);
+        $checkrow = $row2["view_id"];
+        if (empty($checkrow)) {
+            $error = true;
+            $messageerror = "查無景點!";
+        }
+        if (!$error) {
+            header("Location:result.php?keyword=$word&source=FaceBook");
+        }
+        break;
+     case "instagram":
+        $sourcesql=" and source=0";
+        $check = "SELECT * FROM `sight` WHERE status=1 ".$sourcesql." and view_name like '%$word%'";
+        $chresult = mysqli_query($con, $check);
+        $row2 = mysqli_fetch_assoc($chresult);
+        $checkrow = $row2["view_id"];
+        if (empty($checkrow)) {
+            $error = true;
+            $messageerror = "查無景點!";
+        }
+        if (!$error) {
+            header("Location:result.php?keyword=$word&source=instagram");
+        }
+        break;
+     case "All":
+        $check = "SELECT * FROM `sight` WHERE status=1 and view_name like '%$word%'";
+        $chresult = mysqli_query($con, $check);
+        $row2 = mysqli_fetch_assoc($chresult);
+        $checkrow = $row2["view_id"];
+        if (empty($checkrow)) {
+            $error = true;
+            $messageerror = "查無景點!";
+        }
+        if (!$error) {
+            header("Location:result.php?keyword=$word&source=All");
+        }
+        break;   
+    }
+}
     }
 
 ?>
@@ -107,8 +158,14 @@ if (isset($_POST['submit'])) {
                     <div class="form-group">
                         <label for="name"> 關鍵字</label>
                         <input type="text" name="keyword" class="form-control mb-4" required>
+                    <?php if($facebookswitch==1) { ?>
+                        <label for="name"> 搜尋來源:</label>
+                            <input type="radio" name="source" value=instagram>IG
+                            <input type="radio" name="source" value=FaceBook>FB
+                            <input type="radio" name="source" value=All required>全部
+                        <br>
                     </div>
-                    <input type="hidden" name="choose" value=1>
+                    <?php } ?>
                     <span class="text-danger"><?php if (isset($messageerror)) echo $messageerror; ?></span>
                     <center><button class="btn btn-info btn-block my-4" type="submit" name="submit">搜尋</button></center>
                 </form>

@@ -120,7 +120,7 @@ if (isset($_POST['submit'])) {
 					<label>☀會員身分</label>
 					<select name="Authority" class="form-control mb-4" required >
 						<option value="" disabled="disabled">請選擇狀況</option>
-						<option value="0" <?php if (!(strcmp("0", $Authority))||!(strcmp(null, $Authority))) {echo "selected=\"selected\"";} ?>>未驗證會員
+						<option value="0" <?php if (!(strcmp("0", $Authority))) {echo "selected=\"selected\"";} ?>>未驗證會員
 						<option value="1" <?php if (!(strcmp("1", $Authority))) {echo "selected=\"selected\"";} ?>>一般會員
 						<option value="2" <?php if (!(strcmp("2", $Authority))) {echo "selected=\"selected\"";} ?>>管理員
 					</select>
@@ -128,10 +128,9 @@ if (isset($_POST['submit'])) {
 					<center><input class="btn btn-info btn-block my-4 btn-lg" type="button" name="button" value="回上一頁" onClick="location.href='managemember.php'"></center>
 					<center><button class="btn btn-info btn-block my-4" type="submit" name="submit">更改會員資料</button></center>
 					<span class="text-success"><?php if (isset($successmsg)) echo $successmsg; ?></span>
-					<span class="text-danger"><?php if (isset($errormsg))  echo $errormsg.$sqlUpdate; ?></span>
+					<span class="text-danger"><?php if (isset($errormsg))  echo $errormsg; ?></span>
 					</div>
 					<!-- 顯示結果 -->
-
 				</form>
 			</div>
 		</div>

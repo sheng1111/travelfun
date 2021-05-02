@@ -1,11 +1,11 @@
 ﻿<?php
 session_start();
 include 'dbconnect.php';
+include 'function.php';
 //定義時間,使用者變數
 date_default_timezone_set("Asia/Taipei");
 mysqli_query($con, "SET NAMES UTF8");
 $user_id = $_SESSION['user_id'];
-
 //收藏景點功能
 if (isset($_GET['addfavorite'])) {
     $view_id = $_GET['addfavorite'];
@@ -23,32 +23,80 @@ if (isset($_GET['addfavorite'])) {
         mysqli_query($con, $addsql);
     }
 }
-
-//接收搜尋頁面的資料
+//接收搜尋頁面的資料(SQL語法變數設定)
 if (!empty($_GET["tagname"])) {
     $name = $_GET["tagname"];
 } else if (!empty($_GET["keyword"])) {
     $name = $_GET["keyword"];
 }
+//來源變數設定
+$sourcemode=$_GET["source"];
+//來源名稱標示
+if($facebookswitch==1){
+    if($sourcemode=="FaceBook")
+    {$sourcename="(FaceBook)";}
+    if($sourcemode=="instagram")
+    {$sourcename="(instagram)";}
+    if($sourcemode=="All")
+    {$sourcename="(全部)";}
+}
+//鏈結變數設定
+if(isset($_GET["source"]))
+{$sourcelink="&source=".$_GET["source"];}
+if (isset($_GET["tagname"])) {
+    $link = "tagname=".$_GET["tagname"].$sourcelink."&page=";
+} 
+else{if (isset($_GET["keyword"])) {
+    $link = "keyword=".$_GET["keyword"].$sourcelink."&page=";
+}
+else
+{$link = "page=".$sourcelink;}}
 //運用條件搜尋相關資料
 if (!empty($_GET["tagname"])) {
-    $sql = "SELECT `view_id`,`view_name`, `shortcode`, `timestamp`, `tag_area`";
-    $sql .= " FROM ig_sights";
+    $sql = "SELECT `view_id`,`view_name`, `shortcode`, `timestamp`, `tag_area`,`source`";
+    $sql .= " FROM sight";
     $sql .= " WHERE tag_area='" . $_GET["tagname"] . "' and ";
+    if($facebookswitch==1){
+        if($sourcemode=="FaceBook")
+        {$sql .=" source=1 and ";}
+        if($sourcemode=="instagram")
+        {$sql .=" source=0 and ";}
+        if($sourcemode=="All")
+        {$sql .="";}
+    }
+    else {$sql .=" source=0 and";}
     $sql .= " status=1";
     $sql .= " group by `view_name` having count(1)";
     $result = mysqli_query($con, $sql);
 } else if (!empty($_GET["keyword"])) {
-    $sql = "SELECT `view_id`,`view_name`, `shortcode`, `timestamp`, `tag_area`";
-    $sql .= " FROM ig_sights";
+    $sql = "SELECT `view_id`,`view_name`, `shortcode`, `timestamp`, `tag_area`,`source`";
+    $sql .= " FROM sight";
     $sql .= " WHERE view_name like '%$name%' and ";
+    if($facebookswitch==1){
+        if($sourcemode=="FaceBook")
+        {$sql .=" source=1 and ";}
+        if($sourcemode=="instagram")
+        {$sql .=" source=0 and ";}
+        if($sourcemode=="All")
+        {$sql .="";}
+    }
+    else {$sql .=" source=0 and";}
     $sql .= " status=1";
     $sql .= " group by `view_name` having count(1)";
     $result = mysqli_query($con, $sql);
 } else {
-    $sql = "SELECT `view_id`,`view_name`, `shortcode`, `timestamp`, `tag_area`";
-    $sql .= " FROM ig_sights";
+    $sql = "SELECT `view_id`,`view_name`, `shortcode`, `timestamp`, `tag_area`,`source`";
+    $sql .= " FROM sight";
     $sql .= " WHERE status=1";
+    if($facebookswitch==1){
+        if($sourcemode=="FaceBook")
+        {$sql .=" and source=1  ";}
+        if($sourcemode=="instagram")
+        {$sql .=" and source=0  ";}
+        if($sourcemode=="All")
+        {$sql .="";}
+    }
+    else {$sql .=" and source=0";}
     $sql .= " group by `view_name` having count(1)";
     $result = mysqli_query($con, $sql);
 }
@@ -78,11 +126,11 @@ if ($total_records != 0)
     <meta name="keywords" content="Travel">
     <title><?php if (isset($name)) {
                 if (!empty($_GET["tagname"])) {
-                    echo "TAG:" . $name;
+                    echo "TAG:" . $name.$sourcename;
                 } else if (!empty($_GET["keyword"])) {
-                    echo "關鍵字:" . $name;
+                    echo "關鍵字:" . $name.$sourcename;
                 }
-            } else echo "景點選擇"; ?>｜TravelFun</title>
+            } else echo "景點選擇".$sourcename; ?>｜TravelFun</title>
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.11.2/css/all.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
@@ -140,11 +188,11 @@ if ($total_records != 0)
         <div class="container2">
             <h1><?php if (isset($name)) {
                     if (!empty($_GET["tagname"])) {
-                        echo "TAG:" . $name;
+                        echo "TAG:" . $name.$sourcename;
                     } else if (!empty($_GET["keyword"])) {
-                        echo "關鍵字:" . $name;
+                        echo "關鍵字:" . $name.$sourcename;
                     }
-                } else echo "景點總覽"; ?></h1>
+                } else echo "景點總覽".$sourcename; ?></h1>
             <label for="name"> 景點總數：<?php echo $total_records; ?></label>
             <p>
             <div id="left">
@@ -152,9 +200,16 @@ if ($total_records != 0)
                 <?php //顯示記錄
                 $j = 1;
                 while ($row = mysqli_fetch_assoc($result) and $j <= $records_per_page) {
-                    $a = "<b style='color:red;'>".$name."</b>";
+                    if(!empty($_GET["keyword"]))
+                    {$a = "<b style='color:red;'>".$name."</b>";}
+                    else
+                    {$a=$name;}
                     echo "<div >";
-                    echo "<h4><a href='https://www.instagram.com/p/" . $row["shortcode"] . "' style='text-decoration:none; color:black;'>" . str_ireplace($name,$a,$row["view_name"]) . "</a>";
+                    echo "<h4><a href='";
+                    //景點鏈結顯示
+                    if($row["source"]==0){echo "https://www.instagram.com/p/";}
+                    if ($row["source"]==1) {echo "https://www.facebook.com/photo?fbid=";}
+                    echo $row["shortcode"] . "' style='text-decoration:none; color:black;'>" . str_ireplace($name,$a,$row["view_name"]) . "</a>";
                     if (isset($_SESSION['user_id']))
                         if (!empty($_GET["tagname"])) {
                             $ad = "tagname=$name&";
@@ -173,7 +228,14 @@ if ($total_records != 0)
                     } else {
                         echo " &emsp; ";
                     }
-                    echo "TAG:<a href='https://www.instagram.com/explore/tags/" . $row["tag_area"] . "' style='text-decoration:none; color:#A6A6A6;'>" .$row["tag_area"] . "&emsp; </a> ";
+                    echo "TAG:<a href='";
+                    if($row["source"]==0){echo "https://www.instagram.com/explore/tags/";}
+                    if ($row["source"]==1) {echo "";}
+                    echo "" . $row["tag_area"] . "' style='text-decoration:none; color:#A6A6A6;'>" .$row["tag_area"] . "&emsp; </a> ";
+                    if($facebookswitch==1){
+                    echo "來源:";
+                    if ($row["source"]==0) {echo "Instagram";}
+                    if ($row["source"]==1) {echo "FaceBook";}}
                     echo  "</p> </font>";
                     echo "</div>";
                     echo "<hr>";
@@ -188,77 +250,29 @@ if ($total_records != 0)
                         //產生導覽列
                         echo "<p align='center'>";
                         if ($total_pages > 1) {
-                            if (!empty($_GET["tagname"])) {
                                 if ($page > 1) {
-                                    echo "<li class='page-item'><a class='page-link' href='result.php?tagname=" . $_GET["tagname"] . "&page=" . ($page - 1) . "'>上一頁</a> </li> ";
-                                    for ($i = ($page - 2); $i <= min($total_pages, $page - 1); $i++) {
-                                        if ($i == $page)
-                                            echo "<li class='page-item'><a class='page-link' >$i</a></li> ";
-                                        else
-                                                    if ($i <= 0) {
-                                        } else
-                                            echo "<li class='page-item'><a class='page-link' href='result.php?tagname=" . $_GET["tagname"] . "&page=$i'>$i</a></li> ";
-                                    }
-                                }
-                                for ($i = $page; $i <= min($total_pages, $page + 9); $i++) {
-                                    if ($i == $page)
-                                        echo "<li class='page-item'><a class='page-link' >$i</a></li> ";
-                                    else
-                                        echo "<li class='page-item'><a class='page-link' href='result.php?tagname=" . $_GET["tagname"] . "&page=$i'>$i</a></li> ";
-                                }
-                                if ($page < $total_pages) {
-                                    echo "<li class='page-item'><a class='page-link' href='result.php?tagname=" . $_GET["tagname"] . "&page=" . ($page + 1) . "'>下一頁</a></li>";
-                                    echo "</p>";
-                                }
-                            }
-                            else if (!empty($_GET["keyword"])) {
-                                if ($page > 1) {
-                                    echo "<li class='page-item'><a class='page-link' href='result.php?keyword=" . $_GET["keyword"] . "&page=" . ($page - 1) . "'>上一頁</a> </li> ";
-                                    for ($i = ($page - 2); $i <= min($total_pages, $page - 1); $i++) {
-                                        if ($i == $page)
-                                            echo "<li class='page-item'><a class='page-link' >$i</a></li> ";
-                                        else
-                                                    if ($i <= 0) {
-                                        } else
-                                            echo "<li class='page-item'><a class='page-link' href='result.php?keyword=" . $_GET["keyword"] . "&page=$i'>$i</a></li> ";
-                                    }
-                                }
-                                for ($i = $page; $i <= min($total_pages, $page + 9); $i++) {
-                                    if ($i == $page)
-                                        echo "<li class='page-item'><a class='page-link' >$i</a></li> ";
-                                    else
-                                        echo "<li class='page-item'><a class='page-link' href='result.php?keyword=" . $_GET["keyword"] . "&page=$i'>$i</a></li> ";
-                                }
-                                if ($page < $total_pages) {
-                                    echo "<li class='page-item'><a class='page-link' href='result.php?keyword=" . $_GET["keyword"] . "&page=" . ($page + 1) . "'>下一頁</a></li>";
-                                    echo "</p>";
-                                }
-                            } else {
-                                if ($page > 1) {
-                                    echo "<li class='page-item'><a class='page-link' href='result.php?page=" . ($page - 1) . "'>上一頁</a> </li> ";
+                                    echo "<li class='page-item'><a class='page-link' href='result.php?$link" . ($page - 1) . "'>上一頁</a> </li> ";
                                     for ($i = ($page - 2); $i <= min($total_pages, $page - 1); $i++) {
                                         if ($i == $page)
                                             echo "<li class='page-item'><a class='page-link' >$i</a></li> ";
                                         else
                                                 if ($i <= 0) {
                                         } else
-                                            echo "<li class='page-item'><a class='page-link' href='result.php?page=$i'>$i</a></li> ";
+                                            echo "<li class='page-item'><a class='page-link' href='result.php?$link$i'>$i</a></li> ";
                                     }
                                 }
                                 for ($i = $page; $i <= min($total_pages, $page + 9); $i++) {
                                     if ($i == $page)
                                         echo "<li class='page-item'><a class='page-link' >$i</a></li> ";
                                     else
-                                        echo "<li class='page-item'><a class='page-link' href='result.php?page=$i'>$i</a></li> ";
+                                        echo "<li class='page-item'><a class='page-link' href='result.php?$link$i'>$i</a></li> ";
                                 }
                                 if ($page < $total_pages) {
-                                    echo "<li class='page-item'><a class='page-link' href='result.php?page=" . ($page + 1) . "'>下一頁</a></li>";
+                                    echo "<li class='page-item'><a class='page-link' href='result.php?$link" . ($page + 1) . "'>下一頁</a></li>";
                                     echo "</p>";
                                 }
                             }
-                        }
                         ?>
-
                     </li>
                 </ul>
             </td>

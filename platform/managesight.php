@@ -1,6 +1,7 @@
 <?php
 session_start();
 include '../dbconnect.php';
+include '../function.php';
 mysqli_query($con, "SET NAMES UTF8");
 date_default_timezone_set("Asia/Taipei");
 //使用者登入情況下可自動賦予管理權限
@@ -19,13 +20,24 @@ if (isset($_SESSION['user_id'])) {
 }
 //呈現景點
 if ($_GET['repeat'] != true) {
-    $sql   = "SELECT `view_id`,`view_name`, `shortcode`, `timestamp`, `tag_area`,`status`  FROM `ig_sights`";
+    $sql   = "SELECT `view_id`,`view_name`, `shortcode`, `timestamp`, `tag_area`,`status`  FROM `sight`";
     //附加搜尋
     //附加暫存區
     if ($_GET['mode'] == 1) {
         if (isset($_GET['tag'])) {
-            $sql  .= " where `tag_area`='" . $_GET['tag'] . "' and status is null or status !=1";
-        } else $sql  .= " WHERE status is null or status !=1";
+            $sql  .= " where `tag_area`='" . $_GET['tag'] . "' ";
+            if($_GET['source']=="FaceBook")
+            {$sql .=" and source=1";}
+            else
+            {$sql .=" and source=0";}
+            $sql .="and status is null or status !=1";
+        } else 
+        $sql  .= " WHERE ";
+        if($_GET['source']=="FaceBook")
+        {$sql .=" source=1 and ";}
+        else
+        {$sql .=" source=0 and ";}
+        $sql .="status is null or status !=1";
     } else {
 
         //搜尋景點(無法搜尋)
@@ -39,14 +51,35 @@ if ($_GET['repeat'] != true) {
             $sql  .= " and `tag_area`='" . $_GET['tag'] . "'";
         }
     }
+    //搜尋來源設定
+    if($_GET['source']=="FaceBook")
+    {$sql .=" and source=1";}
+    else
+    {$sql .=" and source=0";}
     $sql .= " group by `view_name` having count(1)";
 }
 //附加重複景點
 else {
-    $sql = "SELECT `view_id`, `view_name`, `shortcode`, `timestamp`, `tag_area`,`status` FROM `ig_sights` where `view_name` in (SELECT `view_name` FROM `ig_sights` group by `view_name` HAVING count(`view_name`)>1)";
+    $sql = "SELECT `view_id`, `view_name`, `shortcode`, `timestamp`, `tag_area`,`status` FROM `sight` where";
+        //搜尋來源設定
+        if($_GET['source']=="FaceBook")
+        {$sql .=" source=1 and";}
+        else
+        {$sql .=" source=0 and";}
+    $sql .=" `view_name` in (SELECT `view_name` FROM `sight`"; 
+            //搜尋來源設定
+            if($_GET['source']=="FaceBook")
+            {$sql .=" where source=1";}
+            else
+            {$sql .="where source=0";}
+    $sql .=" group by `view_name` HAVING count(`view_name`)>1)";
     if (isset($_GET['tag'])) {
         $sql  .= " and `tag_area`='" . $_GET['tag'] . "'";
     }
+    if($_GET['source']=="FaceBook")
+    {$sql .=" and source=1";}
+    else
+    {$sql .=" and source=0";}
 }
 $query = mysqli_query($con, $sql);
 //指定每頁顯示幾筆記錄
@@ -66,29 +99,34 @@ $started_record = $records_per_page * ($page - 1);
 if ($total_records != 0)
     mysqli_data_seek($query, $started_record);
 //計算重複警點數
-$repeatsql = "SELECT * FROM `ig_sights` where `view_name` in (SELECT `view_name` FROM `ig_sights` group by `view_name` HAVING count(`view_name`)>1)";
+$repeatsql = "SELECT * FROM `sight` where ";
+    //搜尋來源設定
+    if($_GET['source']=="FaceBook")
+    {$repeatsql .=" source=1";}
+    else
+    {$repeatsql .=" source=0";}
+$repeatsql .=" and `view_name` in (SELECT `view_name` FROM `sight` ";
+    //搜尋來源設定
+    if($_GET['source']=="FaceBook")
+    {$repeatsql .=" where source=1";}
+    else
+    {$repeatsql .=" where source=0";}
+$repeatsql .=" group by `view_name` HAVING count(`view_name`)>1)";
 $repeatquery = mysqli_query($con, $repeatsql);
 $repeattotal_records = mysqli_num_rows($repeatquery);
 if ($repeattotal_records > 0) {
-    $repeatmessage = "<b style='color:red;'>注意:目前有" . $repeattotal_records . "個景點重複，部分條目可能無法顯示，請點選「<a href='?repeat=true'>重複景點</a>」進行更改</b>";
+    $repeatmessage = "<b style='color:red;'>注意:目前有" . $repeattotal_records . "個景點重複，部分條目可能無法顯示，請點選「<a href='?repeat=true";
+    if($_GET['source']=="FaceBook")
+    {$repeatmessage .=  "&source=FaceBook'>重複景點</a>」進行更改</b>";}
+    else
+    {{$repeatmessage .=  "'>重複景點</a>」進行更改</b>";}}
 }
-//頁面模式選擇
-if (!empty($_GET["mode"])) {
-    $echomode = "mode=1&page=";
-} {
-    if (!empty($_GET["search"])) {
-        $echomode = "search=" . $_GET["search"] . "&page=";
-    } {
-        if (!empty($_GET["repeat"])) {
-            $echomode = "repeat=true&page=";
-        } else {
-            $echomode = "page=";
-        }
-    }
-}
-
+//回復FB標題
+if($_GET['source']=="FaceBook")
+{$facebookname="FB";
+$facebooklink="&source=FaceBook";}
 //刪除景點
-$delsql = "DELETE FROM`ig_sights` WHERE `view_id` = " . $_GET['delete'];
+$delsql = "DELETE FROM`sight` WHERE `view_id` = " . $_GET['delete'];
 if (isset($_GET['delete'])) {
     if (mysqli_query($con, $delsql))
         if (header("Location:managesight.php")) {
@@ -97,14 +135,24 @@ if (isset($_GET['delete'])) {
             echo "<script> alert('刪除失敗'); </script>";
         }
 }
-$confirmsql = "UPDATE `ig_sights` SET `status` = '1' WHERE `view_id` = " . $_GET['confirm'];
+$confirmsql = "UPDATE `sight` SET `status` = '1' WHERE `view_id` = " . $_GET['confirm'];
 if (isset($_GET['confirm'])) {
     if (mysqli_query($con, $confirmsql))
-        if (header("Location:managesight.php")) {
-            echo "<script> alert('發佈成功');parent.location.href='managesight.php?mode=1'; </script>";
+        header("Location:managesight.php?mode=1.$facebooklink"); 
+}
+//頁面模式選擇
+if (!empty($_GET["mode"])) {
+    $echomode = "mode=1".$facebooklink."&page=";
+} {
+    if (!empty($_GET["search"])) {
+        $echomode = "search=" . $_GET["search"] .$facebooklink. "&page=";
+    } {
+        if (!empty($_GET["repeat"])) {
+            $echomode = "repeat=true".$facebooklink."&page=";
         } else {
-            echo "<script> alert('發佈失敗');parent.location.href='managesight.php?mode=1'; </script>";
+            $echomode = $facebooklink."page=";
         }
+    }
 }
 ?>
 
@@ -151,23 +199,25 @@ if (isset($_GET['confirm'])) {
                     <div class="text-center p-5 col-lg-10 offset-lg-1">
                         <fieldset></fieldset>
                         <h4 class="text-center card-title"><b><?php if (isset($_GET['search'])) {
-                                                                    echo "關鍵字:" . $_GET['search'];
-                                                                } else if ($_GET['mode'] == 1) echo "IG景點暫存區";
+                                                                    echo $facebookname."關鍵字:" . $_GET['search'];
+                                                                } else if ($_GET['mode'] == 1) {if($_GET['source']=="FaceBook") echo "FB景點暫存區"; else echo "IG景點暫存區";}
                                                                 else if ($_GET['repeat'] == true) {
-                                                                    echo "重複名稱景點";
+                                                                    echo $facebookname."重複名稱景點";
                                                                 } else {
-                                                                    echo "景點管理";
+                                                                    echo $facebookname."景點管理";
                                                                 } ?></b></h4>
                         <table class="table">
                             <tr>
                                 <td><input style="white-space:nowrap" class="btn btn-secondary btn-block btn-sm" type="button" value="新增景點" onclick="location.href='addsight.php'" /></td>
-                                <?php if ($_GET['mode'] == 1) { ?> <td><input style="white-space:nowrap" class="btn btn-info btn-block btn-sm" type="button" value="切換景點管理" onclick="location.href='managesight.php'" /></td> <?php } else { ?>
+                                <?php if ($_GET['mode'] == 1) { ?> <td><input style="white-space:nowrap" class="btn btn-info btn-block btn-sm" type="button" value="切換景點管理" onclick="location.href='managesight.php<?php echo "?" .$facebooklink; ?>'" /></td> <?php } else { ?>
                                     <td>
-                                        <nobr><input style="white-space:nowrap" class="btn btn-info btn-block btn-sm" type="button" value="切換暫存區" onclick="location.href='managesight.php?mode=1'" />
+                                        <nobr><input style="white-space:nowrap" class="btn btn-info btn-block btn-sm" type="button" value="切換暫存區" onclick="location.href='managesight.php?mode=1<?php echo $facebooklink; ?>'" />
                                     </td>
                                     </nobr><?php } ?>
-                                <?php if ($_GET['repeat'] == true) { ?> <td><input style="white-space:nowrap" class="btn btn-info btn-block btn-sm" type="button" value="切換景點管理" onclick="location.href='managesight.php'" /></td> <?php } else { ?>
-                                    <td><input style="white-space:nowrap" class="btn btn-info btn-block btn-sm" type="button" value="尋找重複名稱" onclick="location.href='managesight.php?repeat=true'" /></td> <?php } ?>
+                                <?php if ($_GET['repeat'] == true) { ?> <td><input style="white-space:nowrap" class="btn btn-info btn-block btn-sm" type="button" value="切換景點管理" onclick="location.href='managesight.php<?php echo "?" .$facebooklink; ?>'" /></td> <?php } else { ?>
+                                    <td><input style="white-space:nowrap" class="btn btn-info btn-block btn-sm" type="button" value="尋找重複名稱" onclick="location.href='managesight.php?repeat=true<?php echo "?" .$facebooklink; ?>'" /></td> <?php } ?>
+                                    <?php if($facebookswitch==1){if ($_GET['source'] == "FaceBook") { ?><td><input style="white-space:nowrap" class="btn btn-primary btn-block btn-sm" type="button" value="切換IG資料庫" onclick="location.href='?source=Instagram'" /></td> <?php } else { ?>
+                                    <td><input style="white-space:nowrap" class="btn btn-primary btn-block btn-sm" type="button" value="切換FB資料庫" onclick="location.href='?source=FaceBook'" /></td> <?php } }?>
                                 <td>
                                     <form class="" role="form" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="get" name="form">
                                 <td Width="300"><input type="text" name="search" class="form-control" required /></td>
@@ -235,8 +285,8 @@ if (isset($_GET['confirm'])) {
                                     $status     = $row[5];
                                     $a = "<b style='color:red;'>" . $_GET['search'] . "</b>";
                                     //提示重複景點無效無效
-                                    if ($_GET['repeat'] = true) {
-                                        $checksql = "SELECT `view_id` FROM `ig_sights` where view_name='" . $view_name . "' group by `view_name` having count(1)";
+                                    if ($_GET['repeat'] == true) {
+                                        $checksql = "SELECT `view_id` FROM `sight` where view_name='" . $view_name . "' group by `view_name` having count(1)";
                                         $checkresult = mysqli_query($con, $checksql);
                                         $checkrow = mysqli_fetch_assoc($checkresult);
                                         $checkid = $checkrow['view_id'];
@@ -255,7 +305,7 @@ if (isset($_GET['confirm'])) {
                                         <th><?php echo "<a href=?tag=" . $tag_area . ">" . $tag_area . "</a>";  ?></th>
                                         <?php if (isset($on)) { ?>
                                             <th>
-                                                <?php if ($status == null) echo "<a href=?mode=1&confirm=" . intval($view_id) . ">✔️</a>";  ?>
+                                                <?php if ($status == null) echo "<a href=?mode=1".$facebooklink."&confirm=" . intval($view_id) . ">✔️</a>";  ?>
                                             </th>
                                         <?php } ?>
                                         <th><?php echo "<a href=modifysights.php?view_id=" . intval($view_id) . "> 📝</a>" ?></th>
@@ -264,7 +314,7 @@ if (isset($_GET['confirm'])) {
                                             <td>
                                                 <?php if ($view_id != $checkid) {
                                                     echo "<b style='color:red;'><nobr>景點重複<br>無法顯示</nobr></b>";
-                                                }  ?>
+                                                } ?>
                                             </td>
                                         <?php } ?><th>
                                         <?php $j++;

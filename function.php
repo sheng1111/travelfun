@@ -27,4 +27,9 @@ function random_string($length, $characters) {
     return $string;
 }
 
+//功能開關及設定
+//facebook開關(0為關,1為開)
+$facebookswitch=1;
+//facebook圖片貼文連結
+$facebookphoto='https://www.facebook.com/photo?fbid=';
 ?>

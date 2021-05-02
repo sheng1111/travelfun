@@ -49,7 +49,7 @@ if ($day >= $itinerary_days) {
     $day = $itinerary_days;
 }
 //讀取行程內的景點順序
-$sql   = "SELECT sequence.view_id , ig_sights.view_name, sequence.opt_day, sequence.sequence,ig_sights.shortcode FROM `sequence`,ig_sights WHERE `itinerary_id`=$id and sequence.view_id=ig_sights.view_id ";
+$sql   = "SELECT sequence.view_id , sight.view_name, sequence.opt_day, sequence.sequence,sight.shortcode FROM `sequence`,sight WHERE `itinerary_id`=$id and sequence.view_id=sight.view_id ";
 if ($_GET['seeall'] == false) {
     $sql  .= "and opt_day='" . $day . "'";
 }
@@ -65,10 +65,10 @@ $result0 = mysqli_query($con, $sql);
 $total_records0 = mysqli_num_rows($result0);
 
 //讀取收藏景點
-$sql2 = "SELECT favorites.view_id,ig_sights.view_name";
-$sql2 .= " FROM favorites ,ig_sights";
+$sql2 = "SELECT favorites.view_id,sight.view_name";
+$sql2 .= " FROM favorites ,sight";
 $sql2 .= " WHERE user_id= '" . $_SESSION['user_id'] . "' and";
-$sql2 .= " favorites.view_id=ig_sights.view_id";
+$sql2 .= " favorites.view_id=sight.view_id";
 $result2 = mysqli_query($con, $sql2);
 $total_records = mysqli_num_rows($result2);
 
@@ -131,11 +131,11 @@ if (isset($_GET['add'])) {
     $addtodel = $_GET['addtodel'];
     $addsql = "INSERT INTO `sequence`(`itinerary_id`, `view_id`, `opt_day`, `sequence` ) VALUES
     ('" . $id . "', '" . $add . "', 1 , 1 )";
+    $delsql = "DELETE FROM `favorites` WHERE `user_id`= '$user_id'  and `view_id` = " . $add;
     if (mysqli_query($con, $addsql)) {
         if ($addtodel == 1) {
-            $delsql = "DELETE FROM`favorites` WHERE `user_id`= '$user_id'  and `view_id` = " . $add;
             if (mysqli_query($con, $delsql)) {
-                echo "<script> alert('成功新增景點並刪除收藏!');parent.location.href='modifyitinerary.php?id=" . $id . "'; </script>";
+                echo "<script> alert('".$delsql."');parent.location.href='modifyitinerary.php?id=" . $id . "'; </script>";
             }
         } else {
             header("Location: modifyitinerary.php?id=" . $id . "");

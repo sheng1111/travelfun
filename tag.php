@@ -1,10 +1,14 @@
 ﻿<?php
 session_start();
 include 'dbconnect.php';
+include 'function.php';
 
 date_default_timezone_set("Asia/Taipei");
 $sql = "SELECT `tag_area` ,count(tag_area)";
-$sql .= " FROM ig_sights";
+$sql .= " FROM sight";
+$sql .= " WHERE tag_area!='' ";
+if($facebookswitch==1){}
+else{$sql .=" and source=0 ";}
 $sql .= " GROUP BY tag_area";
 mysqli_query($con1, "SET NAMES UTF8");
 $result = mysqli_query($con, $sql);

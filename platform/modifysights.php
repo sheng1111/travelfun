@@ -1,6 +1,7 @@
 <?php
 session_start();
 include '../dbconnect.php';
+include '../function.php';
 date_default_timezone_set("Asia/Taipei");
 mysqli_query($con, "SET NAMES UTF8");
 //使用者登入情況下可自動賦予管理權限
@@ -20,23 +21,26 @@ if (isset($_SESSION['user_id'])) {
 if(isset($_GET['view_id']))
 {$_SESSION['do']=strip_tags($_GET['view_id']);}
 $view_id=$_SESSION['do'];
-$select = "SELECT * from `ig_sights` where `view_id`='" . $view_id . "'";
+$select = "SELECT * from `sight` where `view_id`='" . $view_id . "'";
 $result1 = mysqli_query($con, "$select");
 $row = mysqli_fetch_assoc($result1);
 $view_name = $row["view_name"];
 $shortcode = $row["shortcode"];
 $timestamp = $row["timestamp"];
 $tag_area = $row["tag_area"];
+$source = $row["source"];
 if (isset($_POST['submit'])) {
     $view_name = $_POST["view_name"];
     $shortcode = $_POST["shortcode"];
     $timestamp =  strtotime($_POST["timestamp"]);
     $tag_area = $_POST["tag_area"];
-    $updatesql = "UPDATE `ig_sights` SET
+    $source = $_POST["source"];
+    $updatesql = "UPDATE `sight` SET
     `view_name` = '$view_name',
     `shortcode` = '$shortcode',
     `timestamp` = '$timestamp',
-    `tag_area`= '$tag_area'
+    `tag_area`= '$tag_area',
+    `source` ='$source'
     WHERE  `view_id` =$view_id";
     if (mysqli_query($con, $updatesql)) {
         header("Location:managesight.php");
@@ -89,17 +93,31 @@ if (isset($_POST['submit'])) {
                     <hr class="">
                     <div class="form-row">
                         <div class="form-group col-md-8">
+                            <label>☀景點名稱</label>
                             <input type="text" name="view_name" value="<?PHP echo $view_name; ?>" class="form-control mb-4" placeholder="景點名稱">
                         </div>
                         <div class="form-group col-md-8">
+                            <label>☀貼文代碼<?php if($facebookswitch==1) echo "(連結)"?></label>
                             <input type="text" name="shortcode" value="<?PHP echo $shortcode; ?>" class="form-control mb-4" placeholder="貼文代碼">
                         </div>
                         <div class="form-group col-md-8">
-                            <input type="text" name="timestamp" value="<?PHP echo date("Y/m/d H:i:s", $timestamp); ?>" class="input is-large date_hour form-control mb-4" placeholder="發文時間">
+                            <label>☀發文時間</label>
+                            <input type="text" name="timestamp" value="<?PHP echo date("Y/m/d H:i:s", $timestamp); ?>" class="form-control mb-4" placeholder="發文時間">
                         </div>
                         <div class="form-group col-md-8">
+                            <label>☀發文地點</label>
                             <input type="text" name="tag_area" value="<?PHP echo $tag_area; ?>" class="form-control mb-4" placeholder="發文地點">
                         </div>
+                        <?php if($facebookswitch==1) {?>
+                            <div class="form-group col-md-8">
+                            <label>☀貼文來源</label>
+                            <select name="source" class="form-control mb-4" required >
+						    <option value="" disabled="disabled">請選擇來源</option>
+						    <option value="0" <?php if (!(strcmp("0", $source))) {echo "selected=\"selected\"";} ?>>Instagram
+						    <option value="1" <?php if (!(strcmp("1", $source))) {echo "selected=\"selected\"";} ?>>FaceBook
+					        </select>
+                            </div>
+                        <?php }?>
                     </div>
                     <center><input class="btn btn-info btn-block my-4 btn-lg" type="submit" name="submit" value="修改景點"></center>
                     <center><input class="btn btn-info btn-block my-4 btn-lg" type="button" name="button" value="回上一頁" onClick="location.href='managesight.php'"></center>

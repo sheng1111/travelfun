@@ -21,7 +21,7 @@ $itinerary_days = $row1["itinerary_days"];
 $user_id = $row1["user_id"];
 $user_name = $row1["user_name"];
 //讀取行程裡的景點順序
-$sql   = "SELECT sequence.view_id , ig_sights.view_name, sequence.opt_day,ig_sights.shortcode FROM `sequence`,ig_sights WHERE `itinerary_id`=$id and sequence.view_id=ig_sights.view_id ";
+$sql   = "SELECT sequence.view_id , sight.view_name, sequence.opt_day,sight.shortcode FROM `sequence`,sight WHERE `itinerary_id`=$id and sequence.view_id=sight.view_id ";
 $sql  .= "ORDER BY `sequence`.`opt_day`,`sequence`.`sequence`  ASC";
 $query = mysqli_query($con, $sql);
 $total_records1 = mysqli_num_rows($query);
@@ -162,7 +162,7 @@ if ($day >= $itinerary_days) {
                                             <a title="facebook 點選開啟新視窗" href="javascript: void(window.open(&#39;http://www.facebook.com/share.php?u=&#39;+encodeURIComponent(location.href)+&#39;&amp;t=&#39;+encodeURIComponent(document.title)));"> <img src="image/facebook.png" width="35" height="35"></a>
                                             <a title="twitter 點選開啟新視窗" href="javascript: void(window.open(&#39;http://twitter.com/home/?status=&#39;.concat(encodeURIComponent(document.title)) .concat(&#39; &#39;) .concat(encodeURIComponent(location.href))));"><img src="image/twitter.png" width="35" height="35"></a>
                                             <a title="plurk 點選開啟新視窗" href="javascript: void(window.open(&#39;http://www.plurk.com/?qualifier=shares&amp;status=&#39; .concat(encodeURIComponent(location.href)) .concat(&#39; &#39;) .concat(&#39;(&#39;) .concat(encodeURIComponent(document.title)) .concat(&#39;)&#39;)));"><img src="image/plurk.png" width="35" height="35"></a>
-                                            <a title="line 點選開啟新視窗" href="javascript: void(window.open(&#39;http://line.me/R/msg/text/?&#39;.concat(encodeURIComponent(document.title + &#39;%97&#39;)).concat(encodeURIComponent(location.href)) ));"><img src="image/line.png" width="35" height="35"> </a>
+                                            <a title="line 點選開啟新視窗" href="javascript: void(window.open(&#39;http://line.me/R/msg/text/?&#39;.concat(encodeURIComponent(&#39;&#39;)).concat(encodeURIComponent(location.href)) ));"><img src="image/line.png" width="35" height="35"> </a>
                                         </div>
                                     <?php } ?>
 

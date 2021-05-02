@@ -96,12 +96,12 @@ if(isset($_GET['del']) && $id=$_SESSION['user_id']){
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
     <link rel="stylesheet" href="css/mdb.min.css">
     <link rel="icon" href="image/favicon.png" type="image/ico" />
-    <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="css/result.css">
 </head>
 
 <body>
 <header>
-        <nav class="navbar navbar-expand-lg navbar-dark fixed-top stylish-color-dark">
+        <nav class="navbar navbar-expand-lg navbar-dark fixed-top unique-color">
             <div class="container">
                 <a class="navbar-brand" href="index.php"><strong>Travel Fun</strong></a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -144,6 +144,11 @@ if(isset($_GET['del']) && $id=$_SESSION['user_id']){
         </nav>
     </header>
     <main>
+    <div class="py-md-5">
+            <div class="container2">
+            </div>
+        </div>
+
     </main>
 
 <footer class="page-footer font-small unique-color fixed-bottom">

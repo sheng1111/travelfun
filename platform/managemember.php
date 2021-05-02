@@ -99,45 +99,35 @@ if (isset($_GET['delete'])) {
     $selectsql   = "SELECT * FROM `itinerary` where user_id='" . $del . "'";
     $selquery = mysqli_query($con, $selectsql);
     // fetch multiple row using while loop.
-    while ($row1 = mysqli_fetch_row($selquery)) {
+    while ($row1 = mysqli_fetch_assoc($selquery)) {
         $delsql = "DELETE FROM`sequence` WHERE `itinerary_id` = " . $row1['itinerary_id'];
         $delsql1 = "DELETE FROM`share` WHERE `itinerary_id` = " . $row1['itinerary_id'];
         $delsql2 = "DELETE FROM`itinerary` WHERE `itinerary_id` = " . $row1['itinerary_id'];
-        if (mysqli_query($con, $delsql)) {
-            if (mysqli_query($con, $delsql1)) {
-                if (mysqli_query($con, $delsql2)) {
-                    //單獨刪除項目
-                    $del3sql = "DELETE FROM`favorites` WHERE `user_id` = " . $del; //刪除收藏
-                    $del4sql = "DELETE FROM`friend` WHERE `oneself` = " . $del . " or `others` =" . $_GET['delete']; //刪除好友
-                    $del5sql = "DELETE FROM`user` WHERE `user_id` = " . $del; //刪除使用者
-                    if (mysqli_query($con, $delsql3)) {
-                        if (mysqli_query($con, $delsql14)) {
-                            if (mysqli_query($con, $delsql5)) {
-                                header("Location: managemember.php");
-                            } else {
-                                echo "<script> alert('刪除失敗!');parent.location.href='managemember.php'; </script>";
-                            }
-                        } else {
-                            "<script> alert('刪除失敗!');parent.location.href='managemember.php'; </script>";
-                        }
-                    } else { {
-                            "<script> alert('發生異常!');parent.location.href='managemember.php'; </script>";
-                        }
-                    }
-                } else {
-                    echo "<script> alert('刪除失敗!');parent.location.href='managemember.php'; </script>";
-                }
-            } else {
-                "<script> alert('刪除失敗!');parent.location.href='managemember.php'; </script>";
-            }
-        } else { {
-                "<script> alert('發生異常!');parent.location.href='managemember.php'; </script>";
-            }
+        mysqli_query($con,$delsql);
+        mysqli_query($con,$delsql1);
+        mysqli_query($con,$delsql2);
         }
-    }
+    //單獨刪除項目
+    $del3sql = "DELETE FROM`favorites` WHERE `user_id` = '" . $del."'"; //刪除收藏
+    $del4sql = "DELETE FROM`friend` WHERE `oneself` = '" . $del."' or `others` ='" . $del."'"; //刪除好友
+    $del5sql = "DELETE FROM`user` WHERE `user_id` = '" . $del."'"; //刪除使用者
+    mysqli_query($con, $del3sql);
+    mysqli_query($con, $del4sql);
+    mysqli_query($con, $del5sql);
+    header("Location:managemember.php");
 }
 ?>
 
+<script language="javascript">
+function del(id,name) { 
+var msg = "您真的確定要刪除嗎？\n\n請確認！"; 
+if (confirm(msg)==true){ 
+return true; 
+}else{ 
+return false; 
+} 
+} 
+</script>
 
 <html>
 
@@ -258,9 +248,9 @@ if (isset($_GET['delete'])) {
                                                 }
                                             }
                                             ?></th>
-                                        <th><?php echo "<a href=?send=" . $user_id . ">✉️ </a>";  ?></th>
-                                        <th><?php echo "<a href=modifymember.php?id=" . $user_id . "> 📝</a>" ?></th>
-                                        <th><?php echo "<a href=?delete=" . $user_id . "> ❌</a>";  ?></th>
+                                        <th><?php if($user_name!=$_SESSION['user_id']){echo "<a href=?send=" . $user_id . ">✉️ </a>";}  ?></th>
+                                        <th><?php if($user_name!=$_SESSION['user_id']) {echo "<a href=modifymember.php?id=" . $user_id . "> 📝</a>";} ?></th>
+                                        <th><?php if($user_name!=$_SESSION['user_id']) {echo "<a href=?delete=" . $user_id . "> ❌</a>";}  ?></th>
                                     <?php } ?>
                                     </tr>
                             </tbody>
@@ -300,7 +290,6 @@ if (isset($_GET['delete'])) {
                     </div>
                 </div>
             </div>
-
     </main>
 
     <footer class="page-footer font-small stylish-color-dark fixed-bottom">

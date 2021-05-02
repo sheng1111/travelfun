@@ -1,8 +1,13 @@
 <?php
 session_start();
 include '../dbconnect.php';
+include '../function.php';
 if (isset($_POST['submit'])) {
-    $insertsql = "INSERT INTO ig_sights(`view_name`, `shortcode`, `timestamp`, `tag_area`,`status`)VALUES('" . $_POST["name"] . "', '" . $_POST["code"] . "', '" . strtotime($_POST["timestamp"]) . "',  '" . $_POST["tag"] . "','1')";
+    if($_POST["source"]==1)
+    {$source=1;}
+    if($_POST["source"]!=1)
+    {$source=0;}
+    $insertsql = "INSERT INTO sight(`view_name`, `shortcode`, `timestamp`, `tag_area`,`source`,`status`)VALUES('" . $_POST["name"] . "', '" . $_POST["code"] . "', '" . strtotime($_POST["timestamp"]) . "','" . $_POST["tag"] . "', '".$source."' ,'1')";
     if(mysqli_query($con, $insertsql))
     {header("Location:managesight.php");}
     else
@@ -68,17 +73,31 @@ if (isset($_SESSION['user_id'])) {
                     <hr class="">
                     <div class="form-row">
                         <div class="form-group col-md-8">
+                            <label>☀景點名稱</label>
                             <input type="text" name="name" class="form-control mb-4" placeholder="景點名稱" required>
                         </div>
                         <div class="form-group col-md-8">
+                            <label>☀貼文代碼<?php if($facebookswitch==1) echo "(連結)"?></label>
                             <input type="text" name="code"  class="form-control mb-4" placeholder="貼文代碼" required>
                         </div>
                         <div class="form-group col-md-8">
+                            <label>☀發文時間</label>
                             <input type="text" name="timestamp"  class="input is-large date_hour form-control mb-4" placeholder="發文時間(0000/00/00 00:00:00)" required>
                         </div>
                         <div class="form-group col-md-8">
+                            <label>☀發文地點</label>
                             <input type="text" name="tag" class="form-control mb-4" placeholder="發文地點" required>
                         </div>
+                        <?php if($facebookswitch==1) {?>
+                            <div class="form-group col-md-8">
+                            <label>☀貼文來源</label>
+                            <select name="source" class="form-control mb-4" required >
+						    <option value="" disabled="disabled">請選擇來源</option>
+						    <option value="0" >Instagram
+						    <option value="1" >FaceBook
+					        </select>
+                            </div>
+                        <?php }?>
                         </div>
                             <p>
                             <center><input class="btn btn-info btn-block my-4 btn-lg" type="submit" name="submit" value="新增景點"></center>

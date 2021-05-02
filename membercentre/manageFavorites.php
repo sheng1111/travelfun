@@ -19,9 +19,9 @@ if (isset($_GET['delete'])) {
         }
 }
 //顯示收藏
-$sql = "SELECT favorites.view_id,ig_sights.view_name,ig_sights.shortcode,ig_sights.tag_area ";
-$sql .= "FROM `favorites`,`ig_sights`";
-$sql .= "WHERE favorites.user_id = '$user_id' and ig_sights.view_id=favorites.view_id ";
+$sql = "SELECT favorites.view_id,sight.view_name,sight.shortcode,sight.tag_area ";
+$sql .= "FROM `favorites`,`sight`";
+$sql .= "WHERE favorites.user_id = '$user_id' and sight.view_id=favorites.view_id ";
 $sql .= "GROUP by favorites.view_id";
 mysqli_query($con, "SET NAMES UTF8");
 $result = mysqli_query($con, $sql);
