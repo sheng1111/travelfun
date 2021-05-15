@@ -29,7 +29,16 @@ function random_string($length, $characters) {
 
 //功能開關及設定
 //facebook開關(0為關,1為開)
-$facebookswitch=1;
+$facebookswitch=0;
 //facebook圖片貼文連結
-$facebookphoto='https://www.facebook.com/photo?fbid=';
+$facebooklink='https://www.facebook.com/photo?fbid=';
+//新增地址設定
+$addressmodifyswitch=0;
+//result的googlemap按鈕開關
+$googlemapswitch=1;
+//url轉換
+
+//地區資料庫語法
+if($_GET["tagname"]=="")
+{}
 ?>

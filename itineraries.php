@@ -11,8 +11,22 @@ mysqli_query($con, "SET NAMES UTF8");
 if (!empty($_GET["keyword"])) {
     $name = $_GET["keyword"];
 }
+if (!empty($_GET["id"])) {
+    $id = strip_tags($_GET["id"]);
+    $sql2 = "SELECT * FROM `user` WHERE user_id='" . $id . "'";
+    $result2 = mysqli_query($con, $sql2);
+    $row2 = mysqli_fetch_assoc($result2);
+    $user_name = $row2['user_name'];
+}
 //運用條件搜尋相關資料
-if (!empty($_GET["keyword"])) {
+if (!empty($_GET["id"])) {
+    $sql = "SELECT `itinerary`.`itinerary_id`, `itinerary`.`itinerary_name`, `itinerary`.`public_status`, `itinerary`.`itinerary_date`, `itinerary_days`, `itinerary`.`user_id` ,`user`.`user_name` ";
+    $sql .= " FROM `itinerary`,`user`";
+    $sql .= " WHERE itinerary.user_id='" . $id . "' and ";
+    $sql .= " `itinerary`.`user_id`= `user`.`user_id` and ";
+    $sql .= " `public_status`=1";
+    $result = mysqli_query($con, $sql);
+} else if (!empty($_GET["keyword"])) {
     $sql = "SELECT `itinerary`.`itinerary_id`, `itinerary`.`itinerary_name`, `itinerary`.`public_status`, `itinerary`.`itinerary_date`, `itinerary_days`, `itinerary`.`user_id` ,`user`.`user_name` ";
     $sql .= " FROM `itinerary`,`user`";
     $sql .= " WHERE itinerary_name like '%$name%' and ";
@@ -50,7 +64,9 @@ if ($total_records != 0)
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Travel Fun">
     <meta name="keywords" content="Travel">
-    <title><?php if (isset($name)) {
+    <title><?php if (isset($_GET['id'])) {
+                echo $user_name . "的公開行程";
+            } else if (isset($name)) {
                 echo $name;
             } else echo "行程總覽"; ?>｜TravelFun</title>
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.11.2/css/all.css">
@@ -107,7 +123,9 @@ if ($total_records != 0)
     </header>
     <main>
         <div class="container2">
-            <h1><?php if (isset($name)) {
+            <h1><?php if (isset($_GET['id'])) {
+                    echo $user_name . "的公開行程";
+                } else if (isset($name)) {
                     if (!empty($_GET["keyword"])) {
                         echo "關鍵字:" . $name;
                     }
@@ -124,7 +142,7 @@ if ($total_records != 0)
                     $itinerary_days = $row["itinerary_days"];
                     $totalday = $itinerary_days - 1;
                     echo "<div >";
-                    echo "<h4><a href='itinerary.php?id=" . (int)$row["itinerary_id"] . "' style='text-decoration:none; color:black;'>" . str_ireplace($name, $a, $row["itinerary_name"]) . "</a>";
+                    echo "<h4><a href='itinerary.php?id=" . intval($row["itinerary_id"]) . "' style='text-decoration:none; color:black;'>" . str_ireplace($name, $a, $row["itinerary_name"]) . "</a>";
                     echo "<p>   <font color='#A6A6A6' size='1'>";
                     echo  "出遊日期:" . date("Y年m月d日", strtotime($itinerary_date)) . "~" . date("Y年m月d日", strtotime($itinerary_date . "+ " . $totalday . " day")) . "(共" . $itinerary_days . "天) " . " &emsp;";
                     echo "發文者:<a href='about.php?id=" . $row["user_id"] . "' style='text-decoration:none; color:#A6A6A6;'>" . $row["user_name"] . "&emsp; </a> ";

@@ -6,6 +6,7 @@ date_default_timezone_set("Asia/Taipei");
 $user_id = $_SESSION['user_id'];
 $id = strip_tags($_GET['id']);
 mysqli_query($con, "SET NAMES UTF8");
+$googlemapurl = "https://www.google.com/maps/dir/";
 
 //讀取行程名稱
 $sql1 = "SELECT `itinerary`.`itinerary_name`,`itinerary`.`public_status`,`itinerary`.`itinerary_date`,`itinerary`.`itinerary_days`,`itinerary`.`user_id`,`user`.`user_name`";
@@ -21,10 +22,31 @@ $itinerary_days = $row1["itinerary_days"];
 $user_id = $row1["user_id"];
 $user_name = $row1["user_name"];
 //讀取行程裡的景點順序
-$sql   = "SELECT sequence.view_id , sight.view_name, sequence.opt_day,sight.shortcode FROM `sequence`,sight WHERE `itinerary_id`=$id and sequence.view_id=sight.view_id ";
+$sql   = "SELECT sequence.view_id , sight.view_name, sequence.opt_day,sight.shortcode,sight.source FROM `sequence`,sight WHERE `itinerary_id`=$id and sequence.view_id=sight.view_id ";
 $sql  .= "ORDER BY `sequence`.`opt_day`,`sequence`.`sequence`  ASC";
 $query = mysqli_query($con, $sql);
 $total_records1 = mysqli_num_rows($query);
+//跑出google輸出行程
+$sql2   = "SELECT sequence.view_id , sight.view_name FROM `sequence`,sight WHERE `itinerary_id`=$id and sequence.view_id=sight.view_id ";
+$sql2  .= "ORDER BY `sequence`.`opt_day`,`sequence`.`sequence`  ASC";
+$query2 = mysqli_query($con, $sql2);
+$total_records2 = mysqli_num_rows($query2);
+if ($total_records2 != 0) {
+    while ($row2 = mysqli_fetch_row($query2)) {
+        $view_id      = $row2[0];
+        $view_name    = $row2[1];
+        //確認是否有輸入過地址
+        $checkaddresssql = "SELECT * FROM `note` where view_id=" . $view_id;
+        $checkaddressresult = mysqli_query($con, $checkaddresssql);
+        $checkaddressrow = mysqli_fetch_assoc($checkaddressresult);
+        if (!empty($checkaddressrow)) {
+            $address = "+" . $checkaddressrow['address'];
+        } else {
+            $address = "";
+        }
+        $url = $url . $view_name . $address . "/";
+    }
+}
 //檢視存取權限
 if ($public_status != 1) {
     $check = "SELECT itinerary.`user_id` FROM `itinerary`,`share` WHERE `share`.`itinerary_id`= $id and`share`.`user_id` ='" . $_SESSION['user_id'] . "' and `itinerary`.`itinerary_id`=`share`.`itinerary_id`";
@@ -144,11 +166,23 @@ if ($day >= $itinerary_days) {
                                         $view_name    = $row2[1];
                                         $opt_day      = $row2[2] - 1;
                                         $shortcode    = $row2[3];
+                                        $source       = $row2[4];
                                 ?>
                                         <tr align="center" valign="center">
-
                                             <th align='center'><?php echo $j; ?></th>
-                                            <th align='center'><?php echo "<a href=https://www.instagram.com/p/" . $shortcode . ">" . $view_name . "</a>"; ?></th>
+                                            <th align='center'><?php echo "<a href=";
+                                                                //景點鏈結顯示
+                                                                if ($source == 0) {
+                                                                    echo "https://www.instagram.com/p/";
+                                                                }
+                                                                if ($source == 1) {
+                                                                    if (strpos($shortcode, "http") !== false) {
+                                                                        echo ("");
+                                                                    } else {
+                                                                        echo $facebooklink;
+                                                                    }
+                                                                }
+                                                                echo $shortcode . ">" . $view_name . "</a>"; ?></th>
                                             <th align='center'><?php echo date("m月d日", strtotime($itinerary_date . "+ " . $opt_day . " day")); ?></th>
 
                                         <?php } ?>
@@ -171,15 +205,18 @@ if ($day >= $itinerary_days) {
                                     <?php
                                     //可修改內容
                                     if (isset($user_id)) {
-                                        $check = "SELECT `user_id` FROM `itinerary` WHERE `itinerary_id`= $id and `user_id` ='" . $_SESSION['user_id'] . "'";
+                                        $check = "SELECT `user_id`,`itinerary_id` FROM `itinerary` WHERE `itinerary_id`= $id and `user_id` ='" . $_SESSION['user_id'] . "'";
                                         $result = mysqli_query($con, $check);
                                         $row = mysqli_fetch_assoc($result);
-                                        $check1 = "SELECT itinerary.`user_id` FROM `itinerary`,`share` WHERE `share`.`itinerary_id`= $id and`share`.`user_id` ='" . $_SESSION['user_id'] . "' and `itinerary`.`itinerary_id`=`share`.`itinerary_id`";
+                                        $check1 = "SELECT itinerary.`user_id`,itinerary.`itinerary_id` FROM `itinerary`,`share` WHERE `share`.`itinerary_id`= $id and`share`.`user_id` ='" . $_SESSION['user_id'] . "' and `itinerary`.`itinerary_id`=`share`.`itinerary_id`";
                                         $result1 = mysqli_query($con, $check1);
                                         $row1 = mysqli_fetch_assoc($result1);
+                                        $r1id = $row['itinerary_id'];
+                                        $r2id = $row1['itinerary_id'];
+
                                         if (!empty($user_id)) { ?>
                                             <td>
-                                                <input class='btn btn-info btn-block btn-sm' type='button' value='行程規劃' onclick="location.href='membercentre/manageitinerary.php'" />
+                                                <input class='btn btn-info btn-block btn-sm' type='button' value='返回' onclick="location.href='membercentre/manageitinerary.php'" />
                                             </td>
                                         <?php }
                                         if (!empty($row1)) { ?>
@@ -189,11 +226,19 @@ if ($day >= $itinerary_days) {
                                         <?php }
                                         if (!empty($row) || !empty($row1)) { ?>
                                             <td>
-                                                <input class='btn btn-info btn-block btn-sm' type='button' value='編輯行程' onclick="location.href='membercentre/modifyitinerary.php?id= <?php echo (int)$id;
+                                                <input class='btn btn-info btn-block btn-sm' type='button' value='編輯行程' onclick="location.href='membercentre/modifyitinerary.php?id= <?php if (!empty($r1id)) {
+                                                                                                                                                                                            echo intval($r1id);
+                                                                                                                                                                                        }
+                                                                                                                                                                                        if (!empty($r2id)) {
+                                                                                                                                                                                            echo intval($r2id);
+                                                                                                                                                                                        }
                                                                                                                                                                                         if (!empty($row1)) echo "&share=1";
                                                                                                                                                                                     } ?>'" />
                                             </td>
                                         <?php } ?>
+                                        <td>
+                                            <input class='btn btn-danger btn-block btn-sm ' type='button' value='行程規劃' onclick="location.href='<?php echo $googlemapurl . $url; ?>'" />
+                                        </td>
                                 </tr>
                             </table>
                         </table>

@@ -108,10 +108,10 @@ if ($total_records != 0)
                     <hr class="">
                     <tr>
                         <div align="center">
-                            <a title="facebook 點選開啟新視窗"  href="javascript: void(window.open(&#39;http://www.facebook.com/share.php?u=&#39;+encodeURIComponent(location.href)+&#39;&amp;t=&#39;+encodeURIComponent(document.title)));"> <img src="image/facebook.png"width="35" height="35"></a>
-                            <a title="twitter 點選開啟新視窗"  href="javascript: void(window.open(&#39;http://twitter.com/home/?status=&#39;.concat(encodeURIComponent(document.title)) .concat(&#39; &#39;) .concat(encodeURIComponent(location.href))));"><img src="image/twitter.png"width="35" height="35"></a>
-                            <a title="plurk 點選開啟新視窗"  href="javascript: void(window.open(&#39;http://www.plurk.com/?qualifier=shares&amp;status=&#39; .concat(encodeURIComponent(location.href)) .concat(&#39; &#39;) .concat(&#39;(&#39;) .concat(encodeURIComponent(document.title)) .concat(&#39;)&#39;)));"><img src="image/plurk.png"width="35" height="35"></a>
-                            <a title="line 點選開啟新視窗"  href="javascript: void(window.open(&#39;http://line.me/R/msg/text/?&#39;.concat(encodeURIComponent(document.title + &#39;%97&#39;)).concat(encodeURIComponent(location.href)) ));"><img src="image/line.png"width="35" height="35"> </a>
+                            <a title="facebook 點選開啟新視窗" href="javascript: void(window.open(&#39;http://www.facebook.com/share.php?u=&#39;+encodeURIComponent(location.href)+&#39;&amp;t=&#39;+encodeURIComponent(document.title)));"> <img src="image/facebook.png" width="35" height="35"></a>
+                            <a title="twitter 點選開啟新視窗" href="javascript: void(window.open(&#39;http://twitter.com/home/?status=&#39;.concat(encodeURIComponent(document.title)) .concat(&#39; &#39;) .concat(encodeURIComponent(location.href))));"><img src="image/twitter.png" width="35" height="35"></a>
+                            <a title="plurk 點選開啟新視窗" href="javascript: void(window.open(&#39;http://www.plurk.com/?qualifier=shares&amp;status=&#39; .concat(encodeURIComponent(location.href)) .concat(&#39; &#39;) .concat(&#39;(&#39;) .concat(encodeURIComponent(document.title)) .concat(&#39;)&#39;)));"><img src="image/plurk.png" width="35" height="35"></a>
+                            <a title="line 點選開啟新視窗" href="javascript: void(window.open(&#39;http://line.me/R/msg/text/?&#39;.concat(encodeURIComponent(document.title + &#39;%97&#39;)).concat(encodeURIComponent(location.href)) ));"><img src="image/line.png" width="35" height="35"> </a>
                         </div>
                     </tr>
                     <tr>

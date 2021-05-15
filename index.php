@@ -7,7 +7,7 @@ if (isset($_SESSION['user_id'])) {
     $check0 = "SELECT * FROM `user` WHERE `user_id` ='" . $user_id . "'";
     $chresult0 = mysqli_query($con, $check0);
     $row0 = mysqli_fetch_assoc($chresult0);
-    if(empty($row0)){
+    if (empty($row0)) {
         session_destroy();
         unset($_SESSION['user_id']);
         unset($_SESSION['user_name']);

@@ -58,10 +58,19 @@ $started_record = $records_per_page * ($page - 1);
 if ($total_records != 0)
     mysqli_data_seek($query, $started_record);
 //頁面模式選擇
-if ($_GET['sequence'] == 1){ $echomode="sequence=1&page=";}
-{if (!empty($_GET["search"])){ $echomode="search=" . $_GET['search_id'] . "&page=";}
-{if($_GET['sequence'] == 2){ $echomode="sequence=2page=";}
-else {$echomode="page=";}}}
+if ($_GET['sequence'] == 1) {
+    $echomode = "sequence=1&page=";
+} {
+    if (!empty($_GET["search"])) {
+        $echomode = "search=" . $_GET['search_id'] . "&page=";
+    } {
+        if ($_GET['sequence'] == 2) {
+            $echomode = "sequence=2page=";
+        } else {
+            $echomode = "page=";
+        }
+    }
+}
 //寄信給使用者忘記密碼
 if (isset($_GET['send'])) {
     $id = strip_tags($_GET['send']);
@@ -77,9 +86,9 @@ if (isset($_GET['send'])) {
         $content = '<span style="color:red">** 本郵件由系統自動發送，請勿直接回覆 **</span> <p>' . $username . '，您好! <br>'
             . "請點選下方修改密碼按鈕或連結完成密碼修改:<br>"
             . "<a href='127.0.0.1:8000/travelfun/membercentre/forgot_password.php?key=" . $random . "' style='text-decoration:none; color:black;'> 修改密碼 </a><p>"
-            . "如按鈕點擊無效，請直接點選連結: 127.0.0.1:8000/travelfun/membercentre/forgot_password.php?key=".$random
+            . "如按鈕點擊無效，請直接點選連結: 127.0.0.1:8000/travelfun/membercentre/forgot_password.php?key=" . $random
             . "<p><span style='color:#878787'>--</span>"
-        .'<br><span style="color:#878787">Best Regard</span><br>"
+            . '<br><span style="color:#878787">Best Regard</span><br>"
         <span style="color:#878787">TravelFun團隊</span>';
         $result = "<script> alert('成功寄出信件');parent.location.href='managemember.php'; </script>";
         if (sendmail($username, $useremail, $title, $content, $result)) {
@@ -103,14 +112,14 @@ if (isset($_GET['delete'])) {
         $delsql = "DELETE FROM`sequence` WHERE `itinerary_id` = " . $row1['itinerary_id'];
         $delsql1 = "DELETE FROM`share` WHERE `itinerary_id` = " . $row1['itinerary_id'];
         $delsql2 = "DELETE FROM`itinerary` WHERE `itinerary_id` = " . $row1['itinerary_id'];
-        mysqli_query($con,$delsql);
-        mysqli_query($con,$delsql1);
-        mysqli_query($con,$delsql2);
-        }
+        mysqli_query($con, $delsql);
+        mysqli_query($con, $delsql1);
+        mysqli_query($con, $delsql2);
+    }
     //單獨刪除項目
-    $del3sql = "DELETE FROM`favorites` WHERE `user_id` = '" . $del."'"; //刪除收藏
-    $del4sql = "DELETE FROM`friend` WHERE `oneself` = '" . $del."' or `others` ='" . $del."'"; //刪除好友
-    $del5sql = "DELETE FROM`user` WHERE `user_id` = '" . $del."'"; //刪除使用者
+    $del3sql = "DELETE FROM`favorites` WHERE `user_id` = '" . $del . "'"; //刪除收藏
+    $del4sql = "DELETE FROM`friend` WHERE `oneself` = '" . $del . "' or `others` ='" . $del . "'"; //刪除好友
+    $del5sql = "DELETE FROM`user` WHERE `user_id` = '" . $del . "'"; //刪除使用者
     mysqli_query($con, $del3sql);
     mysqli_query($con, $del4sql);
     mysqli_query($con, $del5sql);
@@ -119,14 +128,14 @@ if (isset($_GET['delete'])) {
 ?>
 
 <script language="javascript">
-function del(id,name) { 
-var msg = "您真的確定要刪除嗎？\n\n請確認！"; 
-if (confirm(msg)==true){ 
-return true; 
-}else{ 
-return false; 
-} 
-} 
+    function del(id, name) {
+        var msg = "您真的確定要刪除嗎？\n\n請確認！";
+        if (confirm(msg) == true) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 </script>
 
 <html>
@@ -155,8 +164,7 @@ return false;
                         <?php if (isset($_SESSION['user_id'])) { ?>
                             <li class="nav-item p-0"><a class="nav-link disabled">Hi, <?php echo $_SESSION['user_name']; ?>!</a></li>
                         <?php } else  ?>
-                        <li class="nav-link p-0"> <a class="nav-link" href="index.php"><img src="../image/home.png" alt="目錄" height="25" width="25"></a> </li>
-                        <li class="nav-link p-0"> <a class="nav-link" href="../index.php"><img src="../image/return.png" alt="返回使用者介面" height="25" width="25"></a> </li>
+                        <li class="nav-link p-0"> <a class="nav-link" href="index.php"><img src="../image/return.png" alt="返回使用者介面" height="25" width="25"></a> </li>
                         <li class="nav-link p-0"> <a class="nav-link" href="../logout.php"><img src="../image/logout.png" alt="登出" height="25" width="25"></a> </li>
                     </ul>
                 </div>
@@ -248,45 +256,51 @@ return false;
                                                 }
                                             }
                                             ?></th>
-                                        <th><?php if($user_name!=$_SESSION['user_id']){echo "<a href=?send=" . $user_id . ">✉️ </a>";}  ?></th>
-                                        <th><?php if($user_name!=$_SESSION['user_id']) {echo "<a href=modifymember.php?id=" . $user_id . "> 📝</a>";} ?></th>
-                                        <th><?php if($user_name!=$_SESSION['user_id']) {echo "<a href=?delete=" . $user_id . "> ❌</a>";}  ?></th>
+                                        <th><?php if ($user_name != $_SESSION['user_id']) {
+                                                echo "<a href=?send=" . $user_id . ">✉️ </a>";
+                                            }  ?></th>
+                                        <th><?php if ($user_name != $_SESSION['user_id']) {
+                                                echo "<a href=modifymember.php?id=" . $user_id . "> 📝</a>";
+                                            } ?></th>
+                                        <th><?php if ($user_name != $_SESSION['user_id']) {
+                                                echo "<a href=?delete=" . $user_id . "> ❌</a>";
+                                            }  ?></th>
                                     <?php } ?>
                                     </tr>
                             </tbody>
                         </table>
-                        <ul class="pagination" >
-                    <li class="page-item">
-                        <?php
-                        //產生導覽列
-                        echo "<p align='center'>";
-                        if ($total_pages > 1) {
-                                if ($page > 1) {
-                                    echo "<li class='page-item'><a class='page-link' href='managemember.php?$echomode" . ($page - 1) . "'>上一頁</a> </li> ";
-                                    for ($i = ($page - 2); $i <= min($total_pages, $page - 1); $i++) {
+                        <ul class="pagination">
+                            <li class="page-item">
+                                <?php
+                                //產生導覽列
+                                echo "<p align='center'>";
+                                if ($total_pages > 1) {
+                                    if ($page > 1) {
+                                        echo "<li class='page-item'><a class='page-link' href='managemember.php?$echomode" . ($page - 1) . "'>上一頁</a> </li> ";
+                                        for ($i = ($page - 2); $i <= min($total_pages, $page - 1); $i++) {
+                                            if ($i == $page)
+                                                echo "<li class='page-item'><a class='page-link' >$i</a></li> ";
+                                            else
+                                                if ($i <= 0) {
+                                            } else
+                                                echo "<li class='page-item'><a class='page-link' href='managemember.php?$echomode$i'>$i</a></li> ";
+                                        }
+                                    }
+                                    for ($i = $page; $i <= min($total_pages, $page + 9); $i++) {
                                         if ($i == $page)
                                             echo "<li class='page-item'><a class='page-link' >$i</a></li> ";
                                         else
-                                                if ($i <= 0) {
-                                        } else
                                             echo "<li class='page-item'><a class='page-link' href='managemember.php?$echomode$i'>$i</a></li> ";
                                     }
+                                    if ($page < $total_pages) {
+                                        echo "<li class='page-item'><a class='page-link' href='managemember.php?$echomode" . ($page + 1) . "'>下一頁</a></li>";
+                                        echo "</p>";
+                                    }
                                 }
-                                for ($i = $page; $i <= min($total_pages, $page + 9); $i++) {
-                                    if ($i == $page)
-                                        echo "<li class='page-item'><a class='page-link' >$i</a></li> ";
-                                    else
-                                        echo "<li class='page-item'><a class='page-link' href='managemember.php?$echomode$i'>$i</a></li> ";
-                                }
-                                if ($page < $total_pages) {
-                                    echo "<li class='page-item'><a class='page-link' href='managemember.php?$echomode" . ($page + 1) . "'>下一頁</a></li>";
-                                    echo "</p>";
-                                }
-                            }
-                        ?>
+                                ?>
 
-                    </li>
-                </ul>
+                            </li>
+                        </ul>
                     </div>
                 </div>
             </div>

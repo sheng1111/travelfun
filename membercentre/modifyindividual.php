@@ -72,7 +72,6 @@ if (isset($_POST['submit'])) {
 			$errormsg = "修改個人資料失敗";
 		}
 	}
-
 }
 ?>
 
@@ -144,7 +143,7 @@ if (isset($_POST['submit'])) {
 		<div class="py-md-5">
 			<div class="container">
 				<form class="p-5 col-md-6 offset-md-3" role="form" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post" name="loginform">
-					<h4 class="text-center card-title"><b>修改個人資料</b></h4>
+					<h4 class="text-center card-title"><b>設定</b></h4>
 					<hr class="">
 					<div class="form-group"><label for="name"> ☀帳號</label>
 						<input type="text" name="id" value="<?PHP echo $id; ?>" class="form-control mb-4" disabled="true" />
@@ -179,12 +178,12 @@ if (isset($_POST['submit'])) {
 						<script>
 							CKEDITOR.replace('introduction');
 						</script>
-							<center><button class="btn btn-info btn-block my-4" type="submit" name="submit">更改個資</button></center>
-							<!-- 顯示結果 -->
-							<span class="text-success"><?php if (isset($successmsg)) echo $successmsg; ?></span>
-							<span class="text-danger"><?php if (isset($errormsg))  echo $errormsg; ?></span>
-							<span class="text-success"><?php if (isset($photosuccessmsg)) echo $photosuccessmsg; ?></span>
-							<span class="text-danger"><?php if (isset($photoerrormsg))  echo $photoerrormsg; ?></span>
+						<center><button class="btn btn-info btn-block my-4" type="submit" name="submit">更改個資</button></center>
+						<!-- 顯示結果 -->
+						<span class="text-success"><?php if (isset($successmsg)) echo $successmsg; ?></span>
+						<span class="text-danger"><?php if (isset($errormsg))  echo $errormsg; ?></span>
+						<span class="text-success"><?php if (isset($photosuccessmsg)) echo $photosuccessmsg; ?></span>
+						<span class="text-danger"><?php if (isset($photoerrormsg))  echo $photoerrormsg; ?></span>
 				</form>
 			</div>
 		</div>

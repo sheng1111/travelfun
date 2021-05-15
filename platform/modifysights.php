@@ -18,9 +18,10 @@ if (isset($_SESSION['user_id'])) {
 } else {
     header("Location: ../login.php");
 }
-if(isset($_GET['view_id']))
-{$_SESSION['do']=strip_tags($_GET['view_id']);}
-$view_id=$_SESSION['do'];
+if (isset($_GET['view_id'])) {
+    $_SESSION['do'] = strip_tags($_GET['view_id']);
+}
+$view_id = $_SESSION['do'];
 $select = "SELECT * from `sight` where `view_id`='" . $view_id . "'";
 $result1 = mysqli_query($con, "$select");
 $row = mysqli_fetch_assoc($result1);
@@ -44,8 +45,9 @@ if (isset($_POST['submit'])) {
     WHERE  `view_id` =$view_id";
     if (mysqli_query($con, $updatesql)) {
         header("Location:managesight.php");
+    } else {
+        echo "<script>alert(更新失敗!);</script>";
     }
-    else{echo "<script>alert(更新失敗!);</script>";}
 }
 ?>
 <html>
@@ -77,8 +79,7 @@ if (isset($_POST['submit'])) {
                         <?php if (isset($_SESSION['user_id'])) { ?>
                             <li class="nav-item p-0"><a class="nav-link disabled">Hi, <?php echo $_SESSION['user_name']; ?>!</a></li>
                         <?php } else  ?>
-                        <li class="nav-link p-0"> <a class="nav-link" href="index.php"><img src="../image/home.png" alt="目錄" height="25" width="25"></a> </li>
-                        <li class="nav-link p-0"> <a class="nav-link" href="../index.php"><img src="../image/return.png" alt="返回使用者介面" height="25" width="25"></a> </li>
+                        <li class="nav-link p-0"> <a class="nav-link" href="index.php"><img src="../image/return.png" alt="返回使用者介面" height="25" width="25"></a> </li>
                         <li class="nav-link p-0"> <a class="nav-link" href="../logout.php"><img src="../image/logout.png" alt="登出" height="25" width="25"></a> </li>
                     </ul>
                 </div>
@@ -97,7 +98,7 @@ if (isset($_POST['submit'])) {
                             <input type="text" name="view_name" value="<?PHP echo $view_name; ?>" class="form-control mb-4" placeholder="景點名稱">
                         </div>
                         <div class="form-group col-md-8">
-                            <label>☀貼文代碼<?php if($facebookswitch==1) echo "(連結)"?></label>
+                            <label>☀貼文代碼<?php if ($facebookswitch == 1) echo "(連結)" ?></label>
                             <input type="text" name="shortcode" value="<?PHP echo $shortcode; ?>" class="form-control mb-4" placeholder="貼文代碼">
                         </div>
                         <div class="form-group col-md-8">
@@ -108,16 +109,20 @@ if (isset($_POST['submit'])) {
                             <label>☀發文地點</label>
                             <input type="text" name="tag_area" value="<?PHP echo $tag_area; ?>" class="form-control mb-4" placeholder="發文地點">
                         </div>
-                        <?php if($facebookswitch==1) {?>
+                        <?php if ($facebookswitch == 1) { ?>
                             <div class="form-group col-md-8">
-                            <label>☀貼文來源</label>
-                            <select name="source" class="form-control mb-4" required >
-						    <option value="" disabled="disabled">請選擇來源</option>
-						    <option value="0" <?php if (!(strcmp("0", $source))) {echo "selected=\"selected\"";} ?>>Instagram
-						    <option value="1" <?php if (!(strcmp("1", $source))) {echo "selected=\"selected\"";} ?>>FaceBook
-					        </select>
+                                <label>☀貼文來源</label>
+                                <select name="source" class="form-control mb-4" required>
+                                    <option value="" disabled="disabled">請選擇來源</option>
+                                    <option value="0" <?php if (!(strcmp("0", $source))) {
+                                                            echo "selected=\"selected\"";
+                                                        } ?>>Instagram
+                                    <option value="1" <?php if (!(strcmp("1", $source))) {
+                                                            echo "selected=\"selected\"";
+                                                        } ?>>FaceBook
+                                </select>
                             </div>
-                        <?php }?>
+                        <?php } ?>
                     </div>
                     <center><input class="btn btn-info btn-block my-4 btn-lg" type="submit" name="submit" value="修改景點"></center>
                     <center><input class="btn btn-info btn-block my-4 btn-lg" type="button" name="button" value="回上一頁" onClick="location.href='managesight.php'"></center>
@@ -139,18 +144,18 @@ if (isset($_POST['submit'])) {
     <script type="text/javascript" src="../js//knockout-file-bindings.js"></script>
     <script type="text/javascript" src="../js/addsight.js"></script>
     <script src="../js/jquery.samask-masker.js"></script>
-	<script>
-	      $(function() {
-	        $.samaskHtml();
-	        $('.phone').samask("(0000)000-0000");
-	        $('.hour').samask("00:00:00");
-	        $('.date').samask("00/00/0000");
-	        $('.date_hour').samask("0000/00/00 00:00:00");
-	        $('.ip_address').samask("000.000.000.000");
-	        $('.percent').samask("%00");
-	        $('.mixed').samask("SSS-000");
-	      });
-	    </script>
+    <script>
+        $(function() {
+            $.samaskHtml();
+            $('.phone').samask("(0000)000-0000");
+            $('.hour').samask("00:00:00");
+            $('.date').samask("00/00/0000");
+            $('.date_hour').samask("0000/00/00 00:00:00");
+            $('.ip_address').samask("000.000.000.000");
+            $('.percent').samask("%00");
+            $('.mixed').samask("SSS-000");
+        });
+    </script>
 </body>
 
 </html>

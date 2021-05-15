@@ -22,7 +22,7 @@ if (isset($key)) {
                     echo "<script> alert('認證成功!');parent.location.href='../index.php'; </script>";
                 } else {
                     echo "<script> alert('認證失敗!');parent.location.href='../index.php'; </script>";
-                }    
+                }
         }
         else {echo "<script> alert('您已經是正式會員囉!');parent.location.href='../index.php'; </script>";}
         }
@@ -31,4 +31,3 @@ if (isset($key)) {
 }
 else
 {header("Location: ../index.php");}
-?>

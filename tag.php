@@ -2,15 +2,66 @@
 session_start();
 include 'dbconnect.php';
 include 'function.php';
-
 date_default_timezone_set("Asia/Taipei");
-$sql = "SELECT `tag_area` ,count(tag_area)";
-$sql .= " FROM sight";
-$sql .= " WHERE tag_area!='' ";
-if($facebookswitch==1){}
-else{$sql .=" and source=0 ";}
-$sql .= " GROUP BY tag_area";
 mysqli_query($con1, "SET NAMES UTF8");
+$countswitch = 1;
+//resultlink
+if ($facebookswitch == 1) {
+    if ($_GET["source"] == "instagram") {
+        $link1 = "&source=instagram";
+    }
+    if ($_GET["source"] == "FaceBook") {
+        $link1 = "&source=FaceBook";
+    }
+    if ($_GET["source"] == "All") {
+        $link1 = "&source=All";
+    }
+} else {
+}
+//導覽列變數
+if ($facebookswitch == 1) {
+    if ($_GET["source"] == "instagram") {
+        $link = "?source=instagram&page=";
+    }
+    if ($_GET["source"] == "FaceBook") {
+        $link = "?source=FaceBook&page=";
+    }
+    if ($_GET["source"] == "All") {
+        $link = "?source=All&page=";
+    }
+} else {
+    $link = "?page=";
+}
+//來源變數設定
+$sourcemode = $_GET["source"];
+//來源名稱標示
+if ($facebookswitch == 1) {
+    if ($sourcemode == "FaceBook") {
+        $sourcename = "(FaceBook)";
+    }
+    if ($sourcemode == "instagram") {
+        $sourcename = "(instagram)";
+    }
+    if ($sourcemode == "All") {
+        $sourcename = "(全部)";
+    }
+}
+//顯示分類
+$sql = "SELECT `tag_area` ,count(tag_area),`view_name` FROM sight";
+$sql .= " WHERE tag_area!='' ";
+if ($facebookswitch == 1) {
+    if ($_GET["source"] == "instagram") {
+        $sql .= " and source=0 ";
+    }
+    if ($_GET["source"] == "FaceBook") {
+        $sql .= " and source=1 ";
+    }
+    if ($_GET["source"] == "All") {
+    }
+} else {
+    $sql .= " and source=0 ";
+}
+$sql .= " GROUP BY tag_area";
 $result = mysqli_query($con, $sql);
 //指定每頁顯示幾筆記錄
 $records_per_page = 10;
@@ -92,20 +143,139 @@ if ($total_records != 0)
 
     <main>
         <div class="container2">
-            <h1>分類總覽</h1>
-            <label for="name"> 分類總數：<?php echo $total_records; ?></label>
+            <h1 <?php if ($countswitch == 0) { ?> align="center" <?php } ?>>分類總覽 <?php echo $sourcename; ?></h1>
+            <?php if ($countswitch == 1 && !empty($_GET["source"])) { ?><label for="name"> 分類總數：<?php echo $total_records;   ?></label> <?php } ?>
             <p>
-            <div id="left">
+            <div id="left" <?php if ($countswitch == 0) { ?> align="center" <?php } ?>>
                 <?php //顯示記錄
-                $j = 1;
-                while ($row = mysqli_fetch_assoc($result) and $j <= $records_per_page) {
-                    echo "<div >";
-                    echo "<h4><a href='result.php?tagname=" . $row["tag_area"] . "' style='text-decoration:none; color:black;'>" . $row["tag_area"] . "</a></h4>";
-                    echo "景點總數:" . $row["count(tag_area)"] . "個 </a> ";
-                    echo  "</p> </font>";
-                    echo "</div>";
-                    echo "<hr>";
-                    $j++;
+                if ($facebookswitch == 1 && empty($_GET["source"])) {
+                    if (empty($_GET["source"])) { ?>
+                        <div>
+                            <h4><a href='tag.php?source=instagram' style='text-decoration:none; color:black;'>Instagram</a></h4>
+                        </div>
+                        <hr>
+                        <div>
+                            <h4><a href='tag.php?source=FaceBook' style='text-decoration:none; color:black;'>FaceBook</a></h4>
+                        </div>
+                        <hr>
+                        <div>
+                            <h4><a href='tag.php?source=All' style='text-decoration:none; color:black;'>全部</a></h4>
+                        </div>
+                        <hr>
+                <?php }
+                } else {
+                    $j = 1;
+                    while ($row = mysqli_fetch_assoc($result) and $j <= $records_per_page) {
+                        $countsql = "SELECT * FROM sight ";
+                        $countsql .= " WHERE tag_area='" . $row["tag_area"] . "'";
+                        if ($facebookswitch == 1) {
+                            if ($_GET["source"] == "instagram") {
+                                $countsql .= " and source=0 ";
+                            }
+                            if ($_GET["source"] == "FaceBook") {
+                                $countsql .= " and source=1 ";
+                            }
+                            if ($_GET["source"] == "All") {
+                            }
+                        } else {
+                            $countsql .= " and source=0 ";
+                        }
+                        $countsql .= " group by `view_name` having count(1)";
+                        $countresult = mysqli_query($con, $countsql);
+                        $countrow = mysqli_fetch_assoc($countresult);
+                        $counttotal = mysqli_num_rows($countresult);
+                        switch ($row["tag_area"]) {
+                            case "keelung":
+                            case "Keelung": //1
+                                $tagname = "基隆";
+                                break;
+                            case "taipei":
+                            case "Taipei": //2
+                                $tagname = "台北";
+                                break;
+                            case "Taoyuan":
+                            case "taoyuan": //3
+                                $tagname = "桃園";
+                                break;
+                            case "Yilan":
+                            case "yilan": //4
+                                $tagname = "宜蘭";
+                                break;
+                            case "Hsinchu":
+                            case "hsinchu": //5
+                                $tagname = "新竹";
+                                break;
+                            case "Miaoli":
+                            case "miaoli": //6
+                                $tagname = "苗栗";
+                                break;
+                            case "Taichung":
+                            case "taichung": //7
+                                $tagname = "台中";
+                                break;
+                            case "Changhua":
+                            case "changhua": //8
+                                $tagname = "彰化";
+                                break;
+                            case "Yunlin":
+                            case "yunlin": //9
+                                $tagname = "雲林";
+                                break;
+                            case "Nantou":
+                            case "nantou": //10
+                                $tagname = "南投";
+                                break;
+                            case "Chiayi":
+                            case "chiayi": //11
+                                $tagname = "嘉義";
+                                break;
+                            case "Tainan":
+                            case "tainan": //12
+                                $tagname = "台南";
+                                break;
+                            case "Kaohsiung":
+                            case "kaohsiung": //13
+                                $tagname = "高雄";
+                                break;
+                            case "Pingtung":
+                            case "pingtung": //14
+                                $tagname = "屏東";
+                                break;
+                            case "Hualien":
+                            case "hualien": //15
+                                $tagname = "花蓮";
+                                break;
+                            case "Taitung":
+                            case "taitung": //16
+                                $tagname = "台東";
+                                break;
+                            case "Penghu":
+                            case "penghu": //17
+                                $tagname = "澎湖";
+                                break;
+                            case "Kinmen":
+                            case "kinmen": //18
+                                $tagname = "金門";
+                                break;
+                            case "mazu":
+                            case "Mazu": //19
+                                $tagname = "馬祖";
+                                break;
+                            default:
+                                $tagname = $row["tag_area"];
+                                break;
+                        }
+
+                        echo "<div>";
+                        echo "<h4><a href='result.php?tagname=" . $row["tag_area"] . "$link1' style='text-decoration:none; color:black;'>" . $tagname . "</a></h4>";
+                        if ($countswitch == 1) {
+                            echo "景點總數:" . $counttotal . "個 </a> ";
+                        }
+                        echo  "</p> </font>";
+                        echo "</div>";
+                        echo "<hr>";
+                        $j++;
+                    }
                 }
                 ?>
             </div>
@@ -117,24 +287,24 @@ if ($total_records != 0)
                         echo "<p align='center'>";
                         if ($total_pages > 1) {
                             if ($page > 1) {
-                                echo "<li class='page-item'><a class='page-link' href='result2.php?page=" . ($page - 1) . "'>上一頁</a> </li> ";
+                                echo "<li class='page-item'><a class='page-link' href='tag.php$link" . ($page - 1) . "'>上一頁</a> </li> ";
                                 for ($i = ($page - 2); $i <= min($total_pages, $page - 1); $i++) {
                                     if ($i == $page)
                                         echo "<li class='page-item'><a class='page-link' >$i</a></li> ";
                                     else
                                                 if ($i <= 0) {
                                     } else
-                                        echo "<li class='page-item'><a class='page-link' href='result2.php?page=$i'>$i</a></li> ";
+                                        echo "<li class='page-item'><a class='page-link' href='tag.php$link$i'>$i</a></li> ";
                                 }
                             }
                             for ($i = $page; $i <= min($total_pages, $page + 9); $i++) {
                                 if ($i == $page)
                                     echo "<li class='page-item'><a class='page-link' >$i</a></li> ";
                                 else
-                                    echo "<li class='page-item'><a class='page-link' href='result2.php?page=$i'>$i</a></li> ";
+                                    echo "<li class='page-item'><a class='page-link' href='tag.php$link$i'>$i</a></li> ";
                             }
                             if ($page < $total_pages) {
-                                echo "<li class='page-item'><a class='page-link' href='result2.php?page=" . ($page + 1) . "'>下一頁</a></li>";
+                                echo "<li class='page-item'><a class='page-link' href='tag.php$link" . ($page + 1) . "'>下一頁</a></li>";
                                 echo "</p>";
                             }
                         }

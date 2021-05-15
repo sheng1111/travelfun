@@ -3,28 +3,32 @@ session_start();
 include '../dbconnect.php';
 include '../function.php';
 if (isset($_POST['submit'])) {
-    if($_POST["source"]==1)
-    {$source=1;}
-    if($_POST["source"]!=1)
-    {$source=0;}
-    $insertsql = "INSERT INTO sight(`view_name`, `shortcode`, `timestamp`, `tag_area`,`source`,`status`)VALUES('" . $_POST["name"] . "', '" . $_POST["code"] . "', '" . strtotime($_POST["timestamp"]) . "','" . $_POST["tag"] . "', '".$source."' ,'1')";
-    if(mysqli_query($con, $insertsql))
-    {header("Location:managesight.php");}
-    else
-    {echo " <script> alert(新增失敗!);</script>";}
+    if ($_POST["source"] == 1) {
+        $source = 1;
+    }
+    if ($_POST["source"] != 1) {
+        $source = 0;
+    }
+    $insertsql = "INSERT INTO sight(`view_name`, `shortcode`, `timestamp`, `tag_area`,`source`,`status`)VALUES('" . $_POST["name"] . "', '" . $_POST["code"] . "', '" . strtotime($_POST["timestamp"]) . "','" . $_POST["tag"] . "', '" . $source . "' ,'1')";
+    if (mysqli_query($con, $insertsql)) {
+        header("Location:managesight.php");
+    } else {
+        echo " <script> alert(新增失敗!);</script>";
+    }
 }
 //使用者登入情況下可自動賦予管理權限
 if (isset($_SESSION['user_id'])) {
-	$sql="SELECT Authority FROM user WHERE user_id = '" . $_SESSION["user_id"]. "'";
-	$result = mysqli_query($con, $sql);
-	$row = mysqli_fetch_assoc($result);
-	if (!empty($row)) {
-		$_SESSION['Authority'] = $row['Authority'];
-		//顯示主功能頁面
-	} else
-	{header("Location:../index.php");}
+    $sql = "SELECT Authority FROM user WHERE user_id = '" . $_SESSION["user_id"] . "'";
+    $result = mysqli_query($con, $sql);
+    $row = mysqli_fetch_assoc($result);
+    if (!empty($row)) {
+        $_SESSION['Authority'] = $row['Authority'];
+        //顯示主功能頁面
+    } else {
+        header("Location:../index.php");
+    }
 } else {
-	header("Location: ../login.php");
+    header("Location: ../login.php");
 }
 
 ?>
@@ -45,26 +49,25 @@ if (isset($_SESSION['user_id'])) {
 </head>
 
 <body>
-<header>
-		<nav class="navbar navbar-expand-lg navbar-dark fixed-top stylish-color-dark">
-			<div class="container">
-				<a class="navbar-brand" href="index.php"><strong>Travel Fun</strong></a>
-				<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-					<span class="navbar-toggler-icon"></span>
-				</button>
-				<div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
-					<ul class="navbar-nav">
-						<?php if (isset($_SESSION['user_id'])) { ?>
-							<li class="nav-item p-0"><a class="nav-link disabled">Hi, <?php echo $_SESSION['user_name']; ?>!</a></li>
-						<?php } else  ?>
-            <li class="nav-link p-0"> <a class="nav-link" href="index.php"><img src="../image/home.png" alt="目錄" height="25" width="25"></a> </li>
-            <li class="nav-link p-0"> <a class="nav-link" href="../index.php"><img src="../image/return.png" alt="返回使用者介面" height="25" width="25"></a> </li>
-						<li class="nav-link p-0"> <a class="nav-link" href="../logout.php"><img src="../image/logout.png" alt="登出" height="25" width="25"></a> </li>
-					</ul>
-				</div>
-			</div>
-		</nav>
-</header>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark fixed-top stylish-color-dark">
+            <div class="container">
+                <a class="navbar-brand" href="index.php"><strong>Travel Fun</strong></a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
+                    <ul class="navbar-nav">
+                        <?php if (isset($_SESSION['user_id'])) { ?>
+                            <li class="nav-item p-0"><a class="nav-link disabled">Hi, <?php echo $_SESSION['user_name']; ?>!</a></li>
+                        <?php } else  ?>
+                        <li class="nav-link p-0"> <a class="nav-link" href="index.php"><img src="../image/return.png" alt="返回使用者介面" height="25" width="25"></a> </li>
+                        <li class="nav-link p-0"> <a class="nav-link" href="../logout.php"><img src="../image/logout.png" alt="登出" height="25" width="25"></a> </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
     <main>
         <div class="py-md-5">
             <div class="container">
@@ -77,40 +80,40 @@ if (isset($_SESSION['user_id'])) {
                             <input type="text" name="name" class="form-control mb-4" placeholder="景點名稱" required>
                         </div>
                         <div class="form-group col-md-8">
-                            <label>☀貼文代碼<?php if($facebookswitch==1) echo "(連結)"?></label>
-                            <input type="text" name="code"  class="form-control mb-4" placeholder="貼文代碼" required>
+                            <label>☀貼文代碼<?php if ($facebookswitch == 1) echo "(連結)" ?></label>
+                            <input type="text" name="code" class="form-control mb-4" placeholder="貼文代碼" required>
                         </div>
                         <div class="form-group col-md-8">
                             <label>☀發文時間</label>
-                            <input type="text" name="timestamp"  class="input is-large date_hour form-control mb-4" placeholder="發文時間(0000/00/00 00:00:00)" required>
+                            <input type="text" name="timestamp" class="input is-large date_hour form-control mb-4" placeholder="發文時間(0000/00/00 00:00:00)" required>
                         </div>
                         <div class="form-group col-md-8">
                             <label>☀發文地點</label>
                             <input type="text" name="tag" class="form-control mb-4" placeholder="發文地點" required>
                         </div>
-                        <?php if($facebookswitch==1) {?>
+                        <?php if ($facebookswitch == 1) { ?>
                             <div class="form-group col-md-8">
-                            <label>☀貼文來源</label>
-                            <select name="source" class="form-control mb-4" required >
-						    <option value="" disabled="disabled">請選擇來源</option>
-						    <option value="0" >Instagram
-						    <option value="1" >FaceBook
-					        </select>
+                                <label>☀貼文來源</label>
+                                <select name="source" class="form-control mb-4" required>
+                                    <option value="" disabled="disabled">請選擇來源</option>
+                                    <option value="0">Instagram
+                                    <option value="1">FaceBook
+                                </select>
                             </div>
-                        <?php }?>
-                        </div>
-                            <p>
-                            <center><input class="btn btn-info btn-block my-4 btn-lg" type="submit" name="submit" value="新增景點"></center>
-                            <center><input class="btn btn-info btn-block my-4 btn-lg" type="button" name="button" value="回上一頁" onClick="location.href='managesight.php'"></center>
-                            </p>
+                        <?php } ?>
+                    </div>
+                    <p>
+                        <center><input class="btn btn-info btn-block my-4 btn-lg" type="submit" name="submit" value="新增景點"></center>
+                        <center><input class="btn btn-info btn-block my-4 btn-lg" type="button" name="button" value="回上一頁" onClick="location.href='managesight.php'"></center>
+                    </p>
                 </form>
             </div>
         </div>
     </main>
 
-	<footer class="page-footer font-small stylish-color-dark fixed-bottom">
-		<div class="footer-copyright text-center py-3">© 2020 Copyright: Travel Fun</div>
-	</footer>
+    <footer class="page-footer font-small stylish-color-dark fixed-bottom">
+        <div class="footer-copyright text-center py-3">© 2020 Copyright: Travel Fun</div>
+    </footer>
 
     <script type="text/javascript" src="../js/mdb.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
@@ -120,17 +123,18 @@ if (isset($_SESSION['user_id'])) {
     <script type="text/javascript" src="../js//knockout-file-bindings.js"></script>
     <script type="text/javascript" src="../js/addsight.js"></script>
     <script src="../js/jquery.samask-masker.js"></script>
-	<script>
-	      $(function() {
-	        $.samaskHtml();
-	        $('.phone').samask("(0000)000-0000");
-	        $('.hour').samask("00:00:00");
-	        $('.date').samask("00/00/0000");
-	        $('.date_hour').samask("0000/00/00 00:00:00");
-	        $('.ip_address').samask("000.000.000.000");
-	        $('.percent').samask("%00");
-	        $('.mixed').samask("SSS-000");
-	      });
-	    </script>
+    <script>
+        $(function() {
+            $.samaskHtml();
+            $('.phone').samask("(0000)000-0000");
+            $('.hour').samask("00:00:00");
+            $('.date').samask("00/00/0000");
+            $('.date_hour').samask("0000/00/00 00:00:00");
+            $('.ip_address').samask("000.000.000.000");
+            $('.percent').samask("%00");
+            $('.mixed').samask("SSS-000");
+        });
+    </script>
 </body>
+
 </html>

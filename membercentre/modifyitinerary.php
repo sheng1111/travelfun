@@ -9,8 +9,8 @@ if (isset($_SESSION['user_id'])) {
     header("Location: ../login.php");
 }
 
-$id = strip_tags($_GET['id']);
-
+$id = strip_tags(intval($_GET['id']));
+$_SESSION['day1'] = $_GET['day'];
 //共享者可修改內容
 if (isset($_GET['share']) || isset($_POST['share'])) {
     $check = "SELECT itinerary.`user_id` FROM `itinerary`,`share` WHERE `share`.`itinerary_id`= $id and`share`.`user_id` ='" . $_SESSION['user_id'] . "' and `itinerary`.`itinerary_id`=`share`.`itinerary_id`";
@@ -49,7 +49,7 @@ if ($day >= $itinerary_days) {
     $day = $itinerary_days;
 }
 //讀取行程內的景點順序
-$sql   = "SELECT sequence.view_id , sight.view_name, sequence.opt_day, sequence.sequence,sight.shortcode FROM `sequence`,sight WHERE `itinerary_id`=$id and sequence.view_id=sight.view_id ";
+$sql   = "SELECT sequence.view_id , sight.view_name, sequence.opt_day, sequence.sequence,sight.shortcode,sight.source FROM `sequence`,sight WHERE `itinerary_id`=$id and sequence.view_id=sight.view_id ";
 if ($_GET['seeall'] == false) {
     $sql  .= "and opt_day='" . $day . "'";
 }
@@ -74,6 +74,16 @@ $total_records = mysqli_num_rows($result2);
 
 //調整景點順序
 if (isset($_GET['sequence'])) {
+    if (!empty($_GET['share'])) {
+        $share = "&share=" . $_GET['share'];
+    } else {
+        $share = "";
+    }
+    if (!empty($_SESSION['day1'])) {
+        $day2 = "&day=" . $_SESSION['day1'];
+    } else {
+        $day2 = "";
+    }
     $sequence = strip_tags($_GET['sequence']);
     $view_id = strip_tags($_GET['view_id']);
     $sqlUpdate = "UPDATE `sequence` SET
@@ -82,13 +92,23 @@ if (isset($_GET['sequence'])) {
      view_id='" . $view_id . "'";
     $row1 = mysqli_query($con, $sqlUpdate);
     if (!empty($row1)) {
-        header("Location: modifyitinerary.php?id=" . $id . "");
+        header("Location: modifyitinerary.php?id=" . $id . $share . $day2 . "");
     } else {
-        echo "<script> alert('調整失敗!');parent.location.href='modifyitinerary.php?id=" . $id . "'; </script>";
+        echo "<script> alert('調整失敗!');parent.location.href='modifyitinerary.php?id=" . $id . $share . $day2 . "'; </script>";
     }
 }
 //調整景點出遊日期
 if (isset($_GET['opt_day'])) {
+    if (!empty($_GET['share'])) {
+        $share = "&share=" . $_GET['share'];
+    } else {
+        $share = "";
+    }
+    if (!empty($_SESSION['day1'])) {
+        $day2 = "&day=" . $_SESSION['day1'];
+    } else {
+        $day2 = "";
+    }
     $opt_day = strip_tags($_GET['opt_day']);
     $view_id = strip_tags($_GET['view_id']);
     $sqlUpdate = "UPDATE `sequence` SET
@@ -98,13 +118,18 @@ if (isset($_GET['opt_day'])) {
      view_id='" . $view_id . "'";
     $row1 = mysqli_query($con, $sqlUpdate);
     if (!empty($row1)) {
-        header("Location: modifyitinerary.php?id=" . $id . "");
+        header("Location: modifyitinerary.php?id=" . $id . $share . $day2 . "");
     } else {
-        echo "<script> alert('調整失敗!');parent.location.href='modifyitinerary.php?id=" . $id . "'; </script>";
+        echo "<script> alert('調整失敗!');parent.location.href='modifyitinerary.php?id=" . $id . $share . $day2 . "'; </script>";
     }
 }
 //刪除行程
 if (isset($_GET['delete'])) {
+    if (!empty($_GET['share'])) {
+        $share = "&share=" . $_GET['share'];
+    } else {
+        $share = "";
+    }
     $del = strip_tags($_GET['delete']);
     $delsql = "DELETE FROM`sequence` WHERE `itinerary_id` = " . $del;
     $delsql1 = "DELETE FROM`share` WHERE `itinerary_id` = " . $del;
@@ -112,15 +137,15 @@ if (isset($_GET['delete'])) {
     if (mysqli_query($con, $delsql)) {
         if (mysqli_query($con, $delsql1)) {
             if (mysqli_query($con, $delsql2)) {
-                header("Location: modifyitinerary.php?id=" . $id . "");
+                header("Location: manageitinerary.php");
             } else {
-                echo "<script> alert('刪除失敗!');parent.location.href='modifyitinerary.php?id=" . $id . "'; </script>";
+                echo "<script> alert('刪除失敗!');parent.location.href='modifyitinerary.php?id=" . $id . $share . "'; </script>";
             }
         } else {
-            "<script> alert('刪除失敗!');parent.location.href='modifyitinerary.php?id=" . $id . "'; </script>";
+            "<script> alert('刪除失敗!');parent.location.href='modifyitinerary.php?id=" . $id . $share . "'; </script>";
         }
     } else { {
-            "<script> alert('發生異常!');parent.location.href='modifyitinerary.php?id=" . $id . "'; </script>";
+            "<script> alert('發生異常!');parent.location.href='modifyitinerary.php?id=" . $id . $share . "'; </script>";
         }
     }
 }
@@ -131,11 +156,11 @@ if (isset($_GET['add'])) {
     $addtodel = $_GET['addtodel'];
     $addsql = "INSERT INTO `sequence`(`itinerary_id`, `view_id`, `opt_day`, `sequence` ) VALUES
     ('" . $id . "', '" . $add . "', 1 , 1 )";
-    $delsql = "DELETE FROM `favorites` WHERE `user_id`= '$user_id'  and `view_id` = " . $add;
+    $del1sql = "DELETE FROM `favorites` WHERE `user_id`= '$user_id'  and `view_id` = " . $add;
     if (mysqli_query($con, $addsql)) {
         if ($addtodel == 1) {
-            if (mysqli_query($con, $delsql)) {
-                echo "<script> alert('".$delsql."');parent.location.href='modifyitinerary.php?id=" . $id . "'; </script>";
+            if (mysqli_query($con, $del1sql)) {
+                echo "<script> alert('成功新增景點並刪除收藏!');parent.location.href='modifyitinerary.php?id=" . $id . "'; </script>";
             }
         } else {
             header("Location: modifyitinerary.php?id=" . $id . "");
@@ -272,7 +297,7 @@ if (isset($_GET['del'])) {
                                 </form>
                             </tr>
                             <tr>
-                                <td><input class="btn btn-info btn-block btn-sm" type="button" value="管理行程" onclick="location.href='manageitinerary.php'" /></td>
+                                <td><input class="btn btn-info btn-block btn-sm" type="button" value="返回" onclick="location.href='manageitinerary.php'" /></td>
                                 <td><input class="btn btn-info btn-block btn-sm" type="button" value="管理收藏" onclick="location.href='manageFavorites.php'" /></td>
                                 <td><input class="btn btn-secondary btn-block btn-sm" type="button" value="編輯行程" onclick="location.href='edititinerary.php?id=<?php {
                                                                                                                                                                     echo $id;
@@ -312,21 +337,58 @@ if (isset($_GET['del'])) {
                                         $opt_day      = $row2[2] - 1;
                                         $sequence     = $row2[3];
                                         $shortcode    = $row2[4];
+                                        $source       = $row2[5];
                                 ?>
                                         <tr align="center" valign="center">
                                             <th align='center'><?php echo $j; ?></th>
-                                            <th align='center'><?php echo "<a href=https://www.instagram.com/p/" . $shortcode . ">" . $view_name . "</a>"; ?></th>
+                                            <th align='center'><?php echo "<a href=";
+                                                                //景點鏈結顯示
+                                                                if ($source == 0) {
+                                                                    echo "https://www.instagram.com/p/";
+                                                                }
+                                                                if ($source == 1) {
+                                                                    if (strpos($shortcode, "http") !== false) {
+                                                                        echo ("");
+                                                                    } else {
+                                                                        echo $facebooklink;
+                                                                    }
+                                                                }
+                                                                echo $shortcode . ">" . $view_name . "</a>"; ?></th>
                                             <th align='center'><?php echo date("m月d日", strtotime($itinerary_date . "+ " . $opt_day . " day")); ?></th>
                                             <?php if ($_GET['seeall'] == false) { ?>
                                                 <th align='center'><?php if ($j != 1) {
-                                                                        echo  "<a href=?id=" . $id . "&view_id=" . $view_id . "&sequence=" . ($sequence - 1) . ">🔺</a> ";
+                                                                        echo  "<a href=?id=" . intval($id) . "&view_id=" . $view_id . "&sequence=" . ($sequence - 1);
+                                                                        if (isset($_GET['share'])) {
+                                                                            echo "&share=1";
+                                                                        }
+                                                                        echo ">🔺</a> ";
                                                                     } ?> </th>
                                                 <th align='center'><?php if ($j != $total_records1) {
-                                                                        echo  "<a href=?id=" . $id . "&view_id=" . $view_id . "&sequence=" . ($sequence + 1) . ">🔻</a>";
+                                                                        echo  "<a href=?id=" . $id . "&view_id=" . $view_id . "&sequence=" . ($sequence + 1);
+                                                                        if (isset($_GET['share'])) {
+                                                                            echo "&share=1";
+                                                                        }
+                                                                        echo ">🔻</a>";
                                                                     } ?></th>
-                                                <th align='center'><?php if ($opt_day + 1 != 1) echo "<a href=?id=" . $id . "&view_id=" . $view_id . "&opt_day=" . ($opt_day + 1 - 1) . ">🔼</a>"; ?> </th>
-                                                <th align='center'><?php if ($opt_day + 1 != $itinerary_days) echo "<a href=?id=" . $id . "&view_id=" . $view_id . "&opt_day=" . ($opt_day + 1 + 1) . ">🔽</a>"; ?></th>
-                                                <th align='center'><?php echo "<a href=?id=" . $id . "&del=" . intval($view_id) . "> ❌</a>";  ?></th>
+                                                <th align='center'><?php if ($opt_day + 1 != 1) {
+                                                                        echo "<a href=?id=" . $id . "&view_id=" . $view_id . "&opt_day=" . ($opt_day + 1 - 1);
+                                                                        if (isset($_GET['share'])) {
+                                                                            echo "&share=1";
+                                                                        }
+                                                                        echo ">🔼</a>";
+                                                                    } ?> </th>
+                                                <th align='center'><?php if ($opt_day + 1 != $itinerary_days) {
+                                                                        echo "<a href=?id=" . $id . "&view_id=" . $view_id . "&opt_day=" . ($opt_day + 1 + 1);
+                                                                        if (isset($_GET['share'])) {
+                                                                            echo "&share=1";
+                                                                        }
+                                                                        echo ">🔽</a>";
+                                                                    } ?></th>
+                                                <th align='center'><?php echo "<a href=?id=" . $id . "&del=" . intval($view_id);
+                                                                    if (isset($_GET['share'])) {
+                                                                        echo "&share=1";
+                                                                    }
+                                                                    echo "> ❌</a>";  ?></th>
                                             <?php } else {
                                             } ?>
                                         <?php } ?>
@@ -344,23 +406,31 @@ if (isset($_GET['del'])) {
                                                                                                         }
                                                                                                     } else {
                                                                                                         echo "hidden";
-                                                                                                    } ?>' value='前一天' onclick='location.href="modifyitinerary.php?id=<?php echo $id; ?>&day=<?php echo ($day - 1); ?>"' /></td>
+                                                                                                    } ?>' value='前一天' onclick='location.href="modifyitinerary.php?id=<?php echo $id; ?><?php if (isset($_GET['share'])) {
+                                                                                                                                                                                            echo "&share=1";
+                                                                                                                                                                                        } ?>&day=<?php echo ($day - 1); ?>"' /></td>
                                         <td> <input class='btn btn-warning btn-block btn-sm' type='<?php if ($_GET['day'] >= $itinerary_days) {
                                                                                                         echo "hidden";
                                                                                                     } else {
                                                                                                         echo "button";
-                                                                                                    } ?>' value='下一天' onclick='location.href="modifyitinerary.php?id=<?php echo $id; ?>&day=<?php echo ($day + 1); ?>"' /></td>
+                                                                                                    } ?>' value='下一天' onclick='location.href="modifyitinerary.php?id=<?php echo $id; ?><?php if (isset($_GET['share'])) {
+                                                                                                                                                                                            echo "&share=1";
+                                                                                                                                                                                        } ?>&day=<?php echo ($day + 1); ?>"' /></td>
                                         <td> <input class="btn btn-info btn-block btn-sm" type="<?php if ($_GET['seeall'] == true) {
                                                                                                     echo "hidden";
                                                                                                 } else {
                                                                                                     echo "button";
-                                                                                                } ?>" value="查看全部" onclick="location.href='modifyitinerary.php?id=<?php echo $id; ?>&seeall=true'" /></td>
+                                                                                                } ?>" value="查看全部" onclick="location.href='modifyitinerary.php?id=<?php echo $id; ?><?php if (isset($_GET['share'])) {
+                                                                                                                                                                                        echo "&share=1";
+                                                                                                                                                                                    } ?>&seeall=true'" /></td>
                                     <?php } ?>
                                     <td> <input class="btn btn-info btn-block btn-sm" type="<?php if ($_GET['seeall'] == false) {
                                                                                                 echo "hidden";
                                                                                             } else {
                                                                                                 echo "button";
-                                                                                            } ?>" value="查看各天" onclick="location.href='modifyitinerary.php?id=<?php echo $id; ?>&day=1'" /></td>
+                                                                                            } ?>" value="查看各天" onclick="location.href='modifyitinerary.php?id=<?php echo $id; ?><?php if (isset($_GET['share'])) {
+                                                                                                                                                                                    echo "&share=1";
+                                                                                                                                                                                } ?>&day=1'" /></td>
                                     <td>
                                         <input class="btn btn-info btn-block btn-sm" type="button" value="行程輸出" onclick="location.href='../itinerary.php?id=<?php echo $id; ?>'" />
                                     </td>

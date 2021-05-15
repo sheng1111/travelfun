@@ -17,7 +17,7 @@ if (isset($_GET['delete'])) {
     if (mysqli_query($con, $delsql)) {
         if (mysqli_query($con, $delsql1)) {
             if (mysqli_query($con, $delsql2)) {
-                header("Location: modifyitinerary.php?id=" . $id . "");
+                header("Location: manageitinerary.php");
             } else {
                 echo "<script> alert('刪除失敗!');parent.location.href='modifyitinerary.php?id=" . $id . "'; </script>";
             }

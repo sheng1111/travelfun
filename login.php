@@ -22,14 +22,14 @@ if (isset($_POST['login'])) {
 
     if (!empty($row)) {
         if ($row['Authority'] == 0 || $row['Authority'] = null) {
-            $errormsg = "請進入信箱完成驗證或修改密碼，謝謝!";}
-        else {
+            $errormsg = "請進入信箱完成驗證或修改密碼，謝謝!";
+        } else {
             $_SESSION['user_id'] = $row['user_id'];
             $_SESSION['user_name'] = $row['user_name'];
             if (!empty($_POST["remember"])) {
                 setcookie("user_key", $row["user_key"], time() + (60 * 60));
             }
-           
+
             header("Location: index.php");
         }
     } else {

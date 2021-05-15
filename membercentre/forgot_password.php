@@ -17,16 +17,18 @@ if (isset($_GET['key'])) {
 if (isset($_POST['change'])) {
     $userpassword = strip_tags($_POST['password']);
     $checkpassword = strip_tags($_POST['checkpassword']);
-    $key= strip_tags($_POST['user_key']);
+    $key = strip_tags($_POST['user_key']);
     if (strlen($userpassword) < 6) {
-        $error = true;
-        {echo "<script> alert('你的密碼不能小於6碼喔!');parent.location.href='forgot_password.php?key=" . $key . "'; </script>";}
+        $error = true; {
+            echo "<script> alert('你的密碼不能小於6碼喔!');parent.location.href='forgot_password.php?key=" . $key . "'; </script>";
+        }
         //$password_error = "你的密碼不能小於6碼喔!";
         //header("Location: forgot_password.php?key=" . $key . "");
     }
     if ($userpassword != $checkpassword) {
-        $error = true;
-        {echo "<script> alert('兩次密碼輸入要相同喔!');parent.location.href='forgot_password.php?key=" . $key . "'; </script>";}
+        $error = true; {
+            echo "<script> alert('兩次密碼輸入要相同喔!');parent.location.href='forgot_password.php?key=" . $key . "'; </script>";
+        }
         //$cpassword_error = "兩次密碼輸入要相同喔!";
         //header("Location: forgot_password.php?key=" . $key . "");
     }
@@ -37,10 +39,11 @@ if (isset($_POST['change'])) {
         user_key='" . $random . "',
         Authority=1
         WHERE `user_key` = '" . $key . "'";
-        if(mysqli_query($con, $sqlUpdate))
-        {echo "<script> alert('修正成功!');parent.location.href='../login.php'; </script>";}
-        else 
-        {header("Location: forgot_password.php?key=" . $key . "");}
+        if (mysqli_query($con, $sqlUpdate)) {
+            echo "<script> alert('修正成功!');parent.location.href='../login.php'; </script>";
+        } else {
+            header("Location: forgot_password.php?key=" . $key . "");
+        }
     }
 }
 //寄送忘記密碼信件
@@ -48,8 +51,8 @@ if (isset($_POST['forgot_password'])) {
     $sql = "SELECT * FROM user WHERE user_id = '" . $_POST["user_id"] . "' and user_email = '" . $_POST["user_email"] . "'";
     $row = mysqli_fetch_assoc(mysqli_query($con, $sql));
     if (!empty($row)) {
-    $random = random_string(32, '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
-    $sqlUpdate = "UPDATE user SET user_key='" . $random . "', Authority=0 WHERE user_id = '" . $_POST["user_id"] . "'";
+        $random = random_string(32, '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
+        $sqlUpdate = "UPDATE user SET user_key='" . $random . "', Authority=0 WHERE user_id = '" . $_POST["user_id"] . "'";
     } else {
         $errormsg = "輸入的帳號和信箱不符!!!";
     }
@@ -61,9 +64,9 @@ if (isset($_POST['forgot_password'])) {
         $content = '<span style="color:red">** 本郵件由系統自動發送，請勿直接回覆 **</span> <p>' . $user_name . '，您好! <br>'
             . "請點選下方修改密碼按鈕或連結完成密碼修改:<br>"
             . "<a href='127.0.0.1:8000/travelfun/membercentre/forgot_password.php?key=" . $random . "' style='text-decoration:none; color:black;'> 修改密碼 </a><p>"
-            . "如按鈕點擊無效，請直接點選連結: 127.0.0.1:8000/travelfun/membercentre/forgot_password.php?key=".$random
+            . "如按鈕點擊無效，請直接點選連結: 127.0.0.1:8000/travelfun/membercentre/forgot_password.php?key=" . $random
             . "<p><span style='color:#878787'>--</span>"
-        .'<br><span style="color:#878787">Best Regard</span><br>"
+            . '<br><span style="color:#878787">Best Regard</span><br>"
         <span style="color:#878787">TravelFun團隊</span>';
         $result = "<script> alert('成功寄出信件');parent.location.href='../login.php'; </script>";
         //寄信
@@ -145,7 +148,7 @@ if (isset($_POST['forgot_password'])) {
                         <div class="user-box">
                             <label>信箱</label>
                             <input type="email" name="user_email" required="請輸入信箱">
-                            
+
                         </div>
                         <center><button class="btn btn-info btn-block my-4" type="submit" name="forgot_password" value=true>忘記密碼</button></center>
                         <?php if (isset($errormsg)) echo $errormsg; ?>
@@ -159,7 +162,7 @@ if (isset($_POST['forgot_password'])) {
                         <h4 class="text-center card-title"><b>重設密碼</b></h4>
                         <div class="user-box">
                             <label>新密碼</label>
-                            <input type="hidden" name="user_key" value=<?php echo $key;?>>
+                            <input type="hidden" name="user_key" value=<?php echo $key; ?>>
                             <input type="password" name="password" required="請輸入密碼">
 
                             <span class="text-danger"><?php if (isset($password_error)) echo $password_error; ?></span>

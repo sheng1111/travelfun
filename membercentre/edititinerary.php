@@ -3,7 +3,7 @@ session_start();
 include_once '../dbconnect.php';
 mysqli_query($con, "SET NAMES UTF8");
 date_default_timezone_set("Asia/Taipei");
-//驗證登入狀態及有無景點ID
+//驗證登入狀態
 if (isset($_SESSION['user_id'])) { {
     }
 } else {
@@ -16,10 +16,10 @@ if (isset($_POST['share'])) {
     $share = strip_tags($_POST['share']);
 }
 if (isset($_GET['id'])) {
-    $id = strip_tags($_GET['id']);
+    $id = strip_tags(intval($_GET['id']));
 }
 if (isset($_POST['id'])) {
-    $id = strip_tags($_POST['id']);
+    $id = strip_tags(intval($_POST['id']));
 }
 //共享者可修改內容
 if (isset($_GET['share']) || isset($_POST['share'])) {
