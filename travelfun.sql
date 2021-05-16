@@ -38,11 +38,22 @@ CREATE TABLE `favorites` (
 --
 
 INSERT INTO `favorites` (`user_id`, `view_id`) VALUES
-('sheng', 55),
-('sheng', 77),
-('sheng', 78),
 ('sheng', 79),
-('sheng', 80);
+('amigo', 80),
+('sheng', 84),
+('sheng', 85),
+('sheng', 91),
+('wanting', 98),
+('chinyu', 294),
+('chinyu', 295),
+('chinyu', 297),
+('chinyu', 299),
+('chinyu', 302),
+('sheng', 428),
+('wanting', 428),
+('wanting', 429),
+('wanting', 430),
+('wanting', 433);
 
 -- --------------------------------------------------------
 
@@ -85,7 +96,9 @@ CREATE TABLE `itinerary` (
 
 INSERT INTO `itinerary` (`itinerary_id`, `itinerary_name`, `public_status`, `itinerary_date`, `itinerary_days`, `user_id`) VALUES
 (5, '台北', 2, '2021-04-13', 3, 'amigo'),
-(19, '基隆', 1, '2021-05-08', 2, 'sheng');
+(20, '基隆', 1, '2021-05-08', 2, 'wanting'),
+(21, '彰化一日遊', 1, '2021-05-15', 1, 'chinyu'),
+(22, '基隆出去玩', 1, '2021-05-15', 2, 'sheng');
 
 -- --------------------------------------------------------
 
@@ -94,6 +107,7 @@ INSERT INTO `itinerary` (`itinerary_id`, `itinerary_name`, `public_status`, `iti
 --
 
 CREATE TABLE `sequence` (
+  `sequence_id` int(11) NOT NULL,
   `itinerary_id` int(10) NOT NULL,
   `view_id` int(11) NOT NULL,
   `opt_day` int(3) NOT NULL,
@@ -104,16 +118,28 @@ CREATE TABLE `sequence` (
 -- 傾印資料表的資料 `sequence`
 --
 
-INSERT INTO `sequence` (`itinerary_id`, `view_id`, `opt_day`, `sequence`) VALUES
-(5, 1, 1, 1),
-(5, 3, 1, 1),
-(5, 4, 1, 2),
-(5, 8, 2, 1),
-(5, 10, 1, 1),
-(19, 55, 1, 1),
-(19, 77, 1, 1),
-(19, 78, 2, 1),
-(19, 80, 2, 1);
+INSERT INTO `sequence` (`sequence_id`, `itinerary_id`, `view_id`, `opt_day`, `sequence`) VALUES
+(1, 5, 1, 1, 1),
+(2, 5, 3, 1, 1),
+(3, 5, 4, 1, 2),
+(4, 5, 8, 2, 1),
+(5, 5, 10, 1, 1),
+(10, 20, 98, 1, 1),
+(11, 20, 428, 2, 1),
+(12, 20, 429, 1, 1),
+(13, 20, 430, 2, 1),
+(14, 20, 433, 1, 1),
+(15, 21, 294, 1, 1),
+(16, 21, 295, 1, 1),
+(17, 21, 297, 1, 1),
+(18, 21, 299, 1, 1),
+(19, 21, 302, 1, 1),
+(20, 22, 79, 1, 1),
+(21, 22, 84, 1, 1),
+(22, 22, 85, 2, 1),
+(23, 22, 91, 2, 1),
+(24, 22, 428, 1, 1),
+(25, 22, 80, 2, 1);
 
 -- --------------------------------------------------------
 
@@ -133,7 +159,7 @@ CREATE TABLE `share` (
 
 INSERT INTO `share` (`share_id`, `itinerary_id`, `user_id`) VALUES
 (23, 5, 'sheng'),
-(29, 19, 'amigo');
+(30, 22, 'amigo');
 
 -- --------------------------------------------------------
 
@@ -567,7 +593,106 @@ INSERT INTO `sight` (`view_id`, `view_name`, `shortcode`, `timestamp`, `tag_area
 (429, '八斗子海岸秘徑 - 大坪海岸-潮間帶', 'COY3KJwHjgu', '1619997155', 'keelung', 0, 1),
 (430, 'Keelung City Taiwan R.O.C', 'COYiN6tgaDT', '1619985945', 'keelung', 0, 1),
 (431, '唉喲唉喲一喲一唷唉喲', 'COYbrWjFSga', '1619982517', 'keelung', 0, 1),
-(433, '老鷹岩', 'COYGDFynbC4', '1619971177}]', 'keelung', 0, 1);
+(433, '老鷹岩', 'COYGDFynbC4', '1619971177}]', 'keelung', 0, 1),
+(434, '瑞穗天合國際觀光酒店 Grand Cosmos Resort', 'COrRE_iMFZW', '1620614494', 'hualien', 0, 1),
+(435, '嘉德萱草 - 金針花園區', 'COrMSH4nBcW', '1620611980', 'hualien', 0, 1),
+(436, '峇里情人度假民宿-峇里島風格、旅行攝影、花蓮民宿', 'COrKCStlz9_', '1620610801', 'hualien', 0, 1),
+(437, '太魯閣國家公園', 'COrFs64MjE9', '1620608529', 'hualien', 0, 1),
+(438, '基隆夜市', 'COw9u3QMKMx', '1620805677', 'keelung', 0, 1),
+(439, '凡不凡咖啡', 'COw64bbjZVz', '1620804183', 'keelung', 0, 1),
+(440, '外木山環海步道', 'COw62_KHqAw', '1620804171}]', 'keelung', 0, 1),
+(441, '合歡山 Hehuan Mountain', 'COy7p64Ls4A', '1620871697', 'keelung', 0, 1),
+(442, '阿根那造船遺址', 'COy4XMprE1S', '1620869971}]', 'keelung', 0, 1),
+(443, '花蓮', 'COy8-JYjuQL', '1620872387', 'hualien', 0, 1),
+(444, 'Hualian City', 'COy8xhaHqi3', '1620872284}]', 'hualien', 0, 1),
+(445, 'kikumo 菊も', 'COzCtQbMDn5', '1620875395', 'taipei', 0, 1),
+(446, 'The Art Space by the Studio', 'COzCkZOjy4S', '1620875322}]', 'taipei', 0, 1),
+(447, '太湖漂浮斑馬線', 'COzWXb-r3ZW', '1620885702', 'Kinmen', 0, 1),
+(448, '金門', 'COzVQ6vF1gq', '1620885124', 'Kinmen', 0, 1),
+(449, 'Zhaishan Tunnel', 'COzTCQ5t_cW', '1620883955}]', 'Kinmen', 0, 1),
+(450, 'Kaohsiung, Taiwan', 'COzcMrCH1bx', '1620888759', 'kaohsiung', 0, 1),
+(451, 'Central Park (Kaohsiung)', 'COzb1KSnnGz', '1620888567', 'kaohsiung', 0, 1),
+(452, '郵寄兵Rangers 歐美精品', 'COzbo-EjDns', '1620888467}]', 'kaohsiung', 0, 1),
+(453, '草民 Tsao Min', 'COzm73XDRUH', '1620894389', 'taitung', 0, 1),
+(454, '台東舊站', 'COzk7KQBBJX', '1620893334', 'taitung', 0, 1),
+(455, '藍蜻蜓速食專賣店', 'COzidnjrYGG', '1620892044', 'taitung', 0, 1),
+(456, 'Mr. Sam - 山姆先生咖啡館', 'COzZ9wXrPrZ', '1620887588}]', 'taitung', 0, 1),
+(457, '金門水頭得月樓', 'CO0d7auBpL4', '1620923221', 'Kinmen', 0, 1),
+(458, 'Kinmen, Fu-Chien, Taiwan', 'CO0ccCPFQ5o', '1620922439', 'Kinmen', 0, 1),
+(459, '金門城', 'CO0cPOqJyiK', '1620922335', 'Kinmen', 0, 1),
+(460, '高洞', 'CO0bKZlhaPW', '1620921771}]', 'Kinmen', 0, 1),
+(461, '淡水三芝淺水灣', 'CO1Y-4zHney', '1620954182', 'taipei', 0, 1),
+(462, '羅斯福路二段上', 'CO1Y7hhgZoa', '1620954155', 'taipei', 0, 1),
+(463, '迎風狗運動公園', 'CO1YwMqrc3h', '1620954062', 'taipei', 0, 1),
+(464, '南石滬公園', 'CO1ViLxtSgg', '1620952374', 'Kinmen', 0, 1),
+(465, '陳清吉洋樓', 'CO1VQfZlkaC', '1620952229', 'Kinmen', 0, 1),
+(466, '嚨口海邊', 'CO1RXTPHvSM', '1620950188}]', 'Kinmen', 0, 1),
+(467, '汐止區', 'CO1cYMpnJVg', '1620955962', 'keelung', 0, 1),
+(468, 'Vita A Simple Cafe法星自家烘焙咖啡', 'CO1bJp0MqD7', '1620955319', 'keelung', 0, 1),
+(469, 'Taipei, Taiwan', 'CO1aUGXnWrQ', '1620954880}]', 'keelung', 0, 1),
+(470, '庶民美術館', 'CO1eA7rnPwZ', '1620956820', 'taipei', 0, 1),
+(471, '象鼻岩景觀區', 'CO1d97nH5Im', '1620956796', 'taipei', 0, 1),
+(472, 'mina.k_nail', 'CO1djf8noeZ', '1620956579', 'taipei', 0, 1),
+(473, 'BELLAVITA', 'CO1dSbLgaEB', '1620956439', 'taipei', 0, 1),
+(474, '汐止和信水蓮山莊', 'CO1dNHkB_Xa', '1620956396}]', 'taipei', 0, 1),
+(475, 'Taoyuan, Taiwan', 'CO1fosFNQgu', '1620957670', 'taoyuan', 0, 1),
+(476, 'UTC Union Beauty Salon', 'CO1XAl6A_3j', '1620953148', 'taoyuan', 0, 1),
+(477, 'UTC Union Beauty Salon', 'CO1W4J9gmJc', '1620953078', 'taoyuan', 0, 1),
+(478, 'UTC Union Beauty Salon', 'CO1Wx6kgf5O', '1620953027}]', 'taoyuan', 0, 1),
+(479, 'HA house 秋', 'CO1esn5nmcH', '1620957178', 'yilan', 0, 1),
+(480, '蘭城晶英酒店 紅樓中餐廳', 'CO1dCJwhuNj', '1620956306', 'yilan', 0, 1),
+(481, '宜蘭縣', 'CO1cN2ZHcnz', '1620955878', 'yilan', 0, 1),
+(482, '宜蘭傳藝園區', 'CO1Zr9wMxF8', '1620954551', 'yilan', 0, 1),
+(483, '烏石港', 'CO1Y0maBALG', '1620954098}]', 'yilan', 0, 1),
+(484, '清境星光月語民宿高山茶酒館', 'CO1e1NRLrKn', '1620957249', 'nantou', 0, 1),
+(485, 'DORIS HOME 朵麗絲的家', 'CO1dwp3n1KK', '1620956687', 'nantou', 0, 1),
+(486, '杉林溪森林生態園區', 'CO1bR1jjsJN', '1620955386', 'nantou', 0, 1),
+(487, '互助國小', 'CO1aD_rjbnM', '1620954748', 'nantou', 0, 1),
+(488, '不靠海', 'CO1SrLtHnFE', '1620950875}]', 'nantou', 0, 1),
+(489, '萬國戲院', 'CO1kuh5h4iL', '1620960340', 'chiayi', 0, 1),
+(490, '正老牌北興榕樹下', 'CO1kVgHHXiQ', '1620960135', 'chiayi', 0, 1),
+(491, '1314觀景台', 'CO1jzORH-bj', '1620959854', 'chiayi', 0, 1),
+(492, '台灣高鐵嘉義站 THSR Chiayi Station', 'CO1aFqinB70', '1620954762', 'chiayi', 0, 1),
+(493, '起風', 'CO1YWnnH2ct', '1620953852}]', 'chiayi', 0, 1),
+(494, '巴西集品-宜蘭店', 'CO1q6-pDkxc', '1620963587', 'yilan', 0, 1),
+(495, '巴西集品-宜蘭店', 'CO1qnGgD7U3', '1620963425', 'yilan', 0, 1),
+(496, '巴西集品-宜蘭店', 'CO1p7AAD6F8', '1620963063', 'yilan', 0, 1),
+(497, '巴西集品-宜蘭店', 'CO1ptyRD09n', '1620962955', 'yilan', 0, 1),
+(498, '巴西集品-宜蘭店', 'CO1pfAvD681', '1620962834}]', 'yilan', 0, 1),
+(499, '雙橡園R1特區', 'CO1rmxJFWFa', '1620963946', 'taichung', 0, 1),
+(500, '村口微光一中店', 'CO1rkyEnOIA', '1620963930', 'taichung', 0, 1),
+(501, '春山相館id photo&amp; Dessert 證件照/台中證件照/大頭照/專業形象照', 'CO1rGdfH1Rb', '1620963681', 'taichung', 0, 1),
+(502, '秀泰生活台中文心店', 'CO1qyUfHz2m', '1620963516', 'taichung', 0, 1),
+(503, 'Uglycookie', 'CO1qx_VsZNq', '1620963514}]', 'taichung', 0, 1),
+(504, 'Subi coffee&amp;bakery', 'CO1sofrHzrK', '1620964485', 'changhua', 0, 1),
+(505, '英格藍家居Eagle', 'CO1musns1Zo', '1620961390', 'changhua', 0, 1),
+(506, '紀家烘焙坊', 'CO1mhiyjb4M', '1620961282', 'changhua', 0, 1),
+(507, 'Goodnight 晚安,美學 - 社頭店', 'CO1mdLPJdM0', '1620961246}]', 'changhua', 0, 1),
+(508, '東港強 和牛 燒肉 潮州門市', 'CO10sAhn4Hx', '1620968708', 'pingtung', 0, 1),
+(509, '牛奶湖', 'CO1ylcanp7n', '1620967605', 'pingtung', 0, 1),
+(510, 'Return｜迴歸', 'CO1yVvGjzLk', '1620967477', 'pingtung', 0, 1),
+(511, '勝利星村 V.I.P Zone', 'CO1xiPYLjXH', '1620967055', 'pingtung', 0, 1),
+(512, '氮醉JoScubar • 鮮釀啤酒', 'CO1xaf2hoyc', '1620966991}]', 'pingtung', 0, 1),
+(513, '潮境公園', 'CO1035fnQhA', '1620968940', 'keelung', 0, 1),
+(514, '基隆 • Kawalulu 美甲工作室', 'CO10xynDeeX', '1620968755', 'keelung', 0, 1),
+(515, '安樓咖啡 ENZO Cafe', 'CO1z6pZH9HC', '1620968303', 'keelung', 0, 1),
+(516, '寂人甜食', 'CO1y2X7H6Kh', '1620967744', 'keelung', 0, 1),
+(517, '基隆夜市', 'CO1yw8nMR3h', '1620967700}]', 'keelung', 0, 1),
+(518, 'JM Auto SPA Taiwan 巧藝專業汽車美容鍍膜', 'CO12WHvNcMW', '1620969577', 'taipei', 0, 1),
+(519, '銀河洞瀑布', 'CO12VEmnUaR', '1620969568', 'taipei', 0, 1),
+(520, 'Taipei', 'CO12Jb3Hyln', '1620969473', 'taipei', 0, 1),
+(521, '石門洞風景區', 'CO12HlBgOaf', '1620969458', 'taipei', 0, 1),
+(522, '國家攝影文化中心 National Center of Photography and I', 'CO113IihfeL', '1620969323}]', 'taipei', 0, 1),
+(523, 'VAN GOGH ATELIER DE PINTURA', 'CO4-f-ZjsXJ', '1621074515', 'taipei', 0, 1),
+(524, '艋舺', 'CO4-aJ0H67N', '1621074468', 'taipei', 0, 1),
+(525, '濟善老麵 中山店', 'CO4-W8xg2vQ', '1621074441', 'taipei', 0, 1),
+(526, 'Paddock Breeze', 'CO4-LKEHHAQ', '1621074345', 'taipei', 0, 1),
+(527, '水炊軒', 'CO4-JoiAVic', '1621074332}]', 'taipei', 0, 1),
+(528, '橫山書法公園', 'CO4-J3tjVb7', '1621074334', 'taoyuan', 0, 1),
+(529, '路伊Salon-美髮/美甲/霧眉/熱蠟美肌', 'CO486Hwh0HC', '1621073681', 'taoyuan', 0, 1),
+(530, '路伊Salon-美髮/美甲/霧眉/熱蠟美肌', 'CO484KNBKp1', '1621073665', 'taoyuan', 0, 1),
+(531, '路伊Salon-美髮/美甲/霧眉/熱蠟美肌', 'CO48L05hNOP', '1621073302', 'taoyuan', 0, 1),
+(532, 'N.V PIZZA 黑.火山披薩 桃園八德店', 'CO47QFEHByf', '1621072812}]', 'taoyuan', 0, 1);
 
 -- --------------------------------------------------------
 
@@ -581,7 +706,6 @@ CREATE TABLE `user` (
   `user_name` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `user_email` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `user_key` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `photo` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `introduction` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `Authority` int(1) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='使用者';
@@ -590,11 +714,12 @@ CREATE TABLE `user` (
 -- 傾印資料表的資料 `user`
 --
 
-INSERT INTO `user` (`user_id`, `user_password`, `user_name`, `user_email`, `user_key`, `photo`, `introduction`, `Authority`) VALUES
-('amigo', '1qaz@WSX', 'amigo', 'amigo1998928@gmail.com', 'wlCCtnaGDxUCZcA0U4AxOCAvgXXqLrW6', NULL, '', 2),
-('chinyu', '1qaz@WSX', 'chinyu', 'amigo1998928@gmail.com', 'U2b4Eln5E1jUMsNer5phbPQtBUTywrCs', NULL, '', 1),
-('sheng', '1qaz@WSX', 'sheng', 'fosilaoshiji@protonmail.com', 'ivShcAVnNtctEFxni5qIQ3B9CMMzIMv5', NULL, '', 2),
-('wanting', '1qaz@WSX', 'wanting', 'ysl58200@gmail.com', '7chJ2yIYfvfMnxebCuArNsauRYRVeiRt', NULL, '', 2);
+INSERT INTO `user` (`user_id`, `user_password`, `user_name`, `user_email`, `user_key`, `introduction`, `Authority`) VALUES
+('amigo', '1qaz@WSX', '朱宥頤', 'amigo1998928@gmail.com', 't49giyn7rvEccQfJ0hzGULjjgmwMQTSV', '', 2),
+('chinyu', '1qaz@WSX', '郭勁佑', 'amigo1998928@gmail.com', 'k06vCVY1yRC7akRReSXicOI4uMUJ90Dd', '', 1),
+('sheng', '1qaz@WSX', '林義昇', 'fosilaoshiji@protonmail.com', 'M2V45CNF5hWsmfZZiUxmJowxtsaegETo', 'Hello!我是義昇\r\n', 2),
+('tiffany', '1qaz@WSX', '洪詩婷', 'tiffany@example.com', 'VSYzK2Bly1NDv3WvD1lgw1YfltDPpY0w', '', 1),
+('wanting', '1qaz@WSX', '楊詠甯', 'ysl58200@gmail.com', 'XBEezPxGxu0K7e3yX0pAKhbEqCEZSUsC', '', 2);
 
 --
 -- 已傾印資料表的索引
@@ -629,7 +754,7 @@ ALTER TABLE `itinerary`
 -- 資料表索引 `sequence`
 --
 ALTER TABLE `sequence`
-  ADD PRIMARY KEY (`itinerary_id`,`view_id`),
+  ADD PRIMARY KEY (`sequence_id`),
   ADD KEY `sights_id` (`view_id`),
   ADD KEY `itinerary_id` (`itinerary_id`);
 
@@ -667,19 +792,25 @@ ALTER TABLE `friend`
 -- 使用資料表自動遞增(AUTO_INCREMENT) `itinerary`
 --
 ALTER TABLE `itinerary`
-  MODIFY `itinerary_id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `itinerary_id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+
+--
+-- 使用資料表自動遞增(AUTO_INCREMENT) `sequence`
+--
+ALTER TABLE `sequence`
+  MODIFY `sequence_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- 使用資料表自動遞增(AUTO_INCREMENT) `share`
 --
 ALTER TABLE `share`
-  MODIFY `share_id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
+  MODIFY `share_id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 
 --
 -- 使用資料表自動遞增(AUTO_INCREMENT) `sight`
 --
 ALTER TABLE `sight`
-  MODIFY `view_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=434;
+  MODIFY `view_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=533;
 
 --
 -- 已傾印資料表的限制式
