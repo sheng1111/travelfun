@@ -21,33 +21,51 @@ if (isset($_SESSION['user_id'])) {
 //呈現景點
 if ($_GET['repeat'] != true) {
     $sql   = "SELECT `view_id`,`view_name`, `shortcode`, `timestamp`, `tag_area`,`status`,`source`  FROM `sight`";
-    //附加搜尋
-    //附加暫存區
-    if ($_GET['mode'] == 1) {
-        if (isset($_GET['tag'])) {
-            $sql  .= " where `tag_area`='" . $_GET['tag'] . "' ";
-            if ($_GET['source'] == "FaceBook") {
-                $sql .= " and source=1";
-            } else {
-                $sql .= " and source=0";
-            }
-            $sql .= "and status is null or status !=1";
-        } else
-            $sql  .= " WHERE ";
-        if ($_GET['source'] == "FaceBook") {
-            $sql .= " source=1 and ";
-        } else {
-            $sql .= " source=0 and ";
-        }
-        $sql .= "status is null or status !=1";
-    } else {
-
+    $sql .= " where ";
+    if (isset($_GET['search'])) {
         //搜尋景點(無法搜尋)
         if (isset($_GET['search'])) {
             $name = strip_tags($_GET['search']);
-            $sql .= " where `view_name` like '%$name%' and status =1 ";
+            $sql .= " `view_name` like '%$name%' ";
+        }
+    }
+    //附加搜尋
+    //附加暫存區
+    else if (isset($_GET['mode'])) {
+        if (isset($_GET['tag'])) {
+            $sql .= " `tag_area`='" . $_GET['tag'] . "' ";
+            if ($_GET['mode'] == 2) {
+                $sql .= " and `view_name` not in  (SELECT `view_name` FROM `sight` WHERE status =1 ";
+                if ($_GET['source'] == "FaceBook") {
+                    $sql .= " and source=1) ";
+                } else {
+                    $sql .= " and source=0) ";
+                }
+            }
+            if ($_GET['source'] == "FaceBook") {
+                $sql .= " and source=1 ";
+            } else {
+                $sql .= " and source=0 ";
+            }
+            $sql .= "and status is null or status !=1";
         } else {
-            $sql  .= " WHERE status =1";
+            if ($_GET['mode'] == 2) {
+                $sql .= "  `view_name` not in  (SELECT `view_name` FROM `sight` WHERE status =1 ";
+                if ($_GET['source'] == "FaceBook") {
+                    $sql .= " and source=1) and";
+                } else {
+                    $sql .= " and source=0) and ";
+                }
+            }
+            if ($_GET['source'] == "FaceBook") {
+                $sql .= " source=1 and ";
+            } else {
+                $sql .= " source=0 and ";
+            }
+            $sql .= "status is null or status !=1";
+        }
+    } else { {
+            $sql  .= " status =1";
         }
         if (isset($_GET['tag'])) {
             $sql  .= " and `tag_area`='" . $_GET['tag'] . "'";
@@ -59,7 +77,9 @@ if ($_GET['repeat'] != true) {
     } else {
         $sql .= " and source=0";
     }
-    $sql .= " group by `view_name` having count(1)";
+    if (!isset($_GET['mode']) && !isset($_GET['search'])) {
+        $sql .= " group by `view_name` having count(1)";
+    }
 }
 //附加重複景點
 else {
@@ -140,31 +160,51 @@ if ($_GET['source'] == "FaceBook") {
 //刪除景點
 $delsql = "DELETE FROM`sight` WHERE `view_id` = " . $_GET['delete'];
 if (isset($_GET['delete'])) {
-    if (mysqli_query($con, $delsql))
-        if (header("Location:managesight.php")) {
-            echo "<script> alert('刪除成功'); </script>";
-        } else {
-            echo "<script> alert('刪除失敗'); </script>";
-        }
-}
-$confirmsql = "UPDATE `sight` SET `status` = '1' WHERE `view_id` = " . $_GET['confirm'];
-if (isset($_GET['confirm'])) {
-    if (mysqli_query($con, $confirmsql))
-        header("Location:managesight.php?mode=1.$facebookgetlink");
-}
-//頁面模式選擇
-if (!empty($_GET["mode"])) {
-    $echomode = "mode=1" . $facebookgetlink . "&page=";
-} {
-    if (!empty($_GET["search"])) {
-        $echomode = "search=" . $_GET["search"] . $facebookgetlink . "&page=";
-    } {
-        if (!empty($_GET["repeat"])) {
-            $echomode = "repeat=true" . $facebookgetlink . "&page=";
-        } else {
-            $echomode = $facebookgetlink . "page=";
+    if (isset($_GET["search"])) {
+        $modeurl = "search=" . $_GET["search"];
+    }
+    if (isset($_GET["mode"])) {
+        $modeurl .= "mode=" . $_GET["mode"];
+    }
+    if (isset($_GET["repeat"])) {
+        $repeaturl = "repeat=true";
+        if (isset($_GET["page"])) {
+            $repeaturl .= "&page=" . $_GET["page"];
         }
     }
+    if (mysqli_query($con, $delsql)) {
+        header("Location:managesight.php?$modeurl$repeaturl$facebookgetlink");
+    } else
+        echo "<script> alert('刪除失敗'); parent.location.href='managesight.php?" . $modeurl . $repeaturl . $facebookgetlink . "';</script>";
+}
+
+$confirmsql = "UPDATE `sight` SET `status` = '1' WHERE `view_id` = " . $_GET['confirm'];
+if (isset($_GET['confirm'])) {
+    if (mysqli_query($con, $confirmsql)) {
+        if (isset($_GET["search"])) {
+            $modeurl = "search=" . $_GET["search"];
+        }
+        if (isset($_GET["mode"])) {
+            $modeurl .= "mode=" . $_GET["mode"];
+        }
+        if (isset($_GET["repeat"])) {
+            $repeaturl = "repeat=true";
+            if (isset($_GET["page"])) {
+                $repeaturl .= "&page=" . $_GET["page"];
+            }
+        }
+        header("Location:managesight.php?$modeurl$repeaturl$facebookgetlink");
+    }
+}
+//頁面模式選擇
+if (isset($_GET["mode"])) {
+    $echomode = "mode=" . $_GET["mode"] . $facebookgetlink . "&page=";
+} else if (isset($_GET["search"])) {
+    $echomode .= "search=" . $_GET["search"] . $facebookgetlink . "&page=";
+} else if (!empty($_GET["repeat"])) {
+    $echomode .= "repeat=true" . $facebookgetlink . "&page=";
+} else {
+    $echomode .= $facebookgetlink . "page=";
 }
 ?>
 
@@ -211,7 +251,7 @@ if (!empty($_GET["mode"])) {
                         <fieldset></fieldset>
                         <h4 class="text-center card-title"><b><?php if (isset($_GET['search'])) {
                                                                     echo $facebookname . "關鍵字:" . $_GET['search'];
-                                                                } else if ($_GET['mode'] == 1) {
+                                                                } else if (isset($_GET['mode'])) {
                                                                     if ($_GET['source'] == "FaceBook") echo "FB景點暫存區";
                                                                     else echo "IG景點暫存區";
                                                                 } else if ($_GET['repeat'] == true) {
@@ -222,13 +262,13 @@ if (!empty($_GET["mode"])) {
                         <table class="table">
                             <tr>
                                 <td><input style="white-space:nowrap" class="btn btn-secondary btn-block btn-sm" type="button" value="新增景點" onclick="location.href='addsight.php'" /></td>
-                                <?php if ($_GET['mode'] == 1) { ?> <td><input style="white-space:nowrap" class="btn btn-info btn-block btn-sm" type="button" value="切換景點管理" onclick="location.href='managesight.php<?php echo "?" . $facebookgetlink; ?>'" /></td> <?php } else { ?>
+                                <?php if (isset($_GET['mode'])) { ?> <td><input style="white-space:nowrap" class="btn btn-info btn-block btn-sm" type="button" value="切換景點管理" onclick="location.href='managesight.php<?php if ($_GET['source'] == "FaceBook") echo "?" . $facebookgetlink; ?>'" /></td> <?php } else { ?>
                                     <td>
-                                        <nobr><input style="white-space:nowrap" class="btn btn-info btn-block btn-sm" type="button" value="切換暫存區" onclick="location.href='managesight.php?mode=1<?php echo $facebookgetlink; ?>'" />
+                                        <nobr><input style="white-space:nowrap" class="btn btn-info btn-block btn-sm" type="button" value="切換暫存區" onclick="location.href='managesight.php?mode=2<?php echo $facebookgetlink; ?>'" />
                                     </td>
                                     </nobr><?php } ?>
-                                <?php if ($_GET['repeat'] == true) { ?> <td><input style="white-space:nowrap" class="btn btn-info btn-block btn-sm" type="button" value="切換景點管理" onclick="location.href='managesight.php<?php echo "?" . $facebookgetlink; ?>'" /></td> <?php } else { ?>
-                                    <td><input style="white-space:nowrap" class="btn btn-info btn-block btn-sm" type="button" value="尋找重複名稱" onclick="location.href='managesight.php?repeat=true<?php echo "?" . $facebookgetlink; ?>'" /></td> <?php } ?>
+                                <?php if ($_GET['repeat'] == true) { ?> <td><input style="white-space:nowrap" class="btn btn-info btn-block btn-sm" type="button" value="切換景點管理" onclick="location.href='managesight.php<?php if ($_GET['source'] == "FaceBook") echo "?" . $facebookgetlink; ?>'" /></td> <?php } else { ?>
+                                    <td><input style="white-space:nowrap" class="btn btn-info btn-block btn-sm" type="button" value="尋找重複名稱" onclick="location.href='managesight.php?repeat=true<?php if ($_GET['source'] == "FaceBook") echo $facebookgetlink; ?>'" /></td> <?php } ?>
                                 <?php if ($facebookswitch == 1) {
                                     if ($_GET['source'] == "FaceBook") { ?><td><input style="white-space:nowrap" class="btn btn-primary btn-block btn-sm" type="button" value="切換IG資料庫" onclick="location.href='?source=Instagram'" /></td> <?php } else { ?>
                                         <td><input style="white-space:nowrap" class="btn btn-primary btn-block btn-sm" type="button" value="切換FB資料庫" onclick="location.href='?source=FaceBook'" /></td> <?php }
@@ -267,7 +307,7 @@ if (!empty($_GET["mode"])) {
                                     <td>
                                         <nobr>標籤地點</nobr>
                                     </td>
-                                    <?php if ($_GET['mode'] == 1 || $_GET['repeat'] == true) {
+                                    <?php if (isset($_GET['mode'])  || $_GET['repeat'] == true || isset($_GET['search'])) {
                                         $on = 1; ?> <td>
                                             <nobr>發佈</nobr>
                                         </td> <?php } ?>
@@ -277,7 +317,7 @@ if (!empty($_GET["mode"])) {
                                     <td>
                                         <nobr>刪除</nobr>
                                     </td>
-                                    <?php if ($_GET['repeat'] == true) { ?><td>
+                                    <?php if ($_GET['repeat'] == true || isset($_GET['mode']) || isset($_GET['search'])) { ?><td>
                                             <nobr>備註</nobr>
                                         </td> <?php } ?>
 
@@ -301,45 +341,87 @@ if (!empty($_GET["mode"])) {
                                     $source       = $row[6];
                                     $a = "<b style='color:red;'>" . $_GET['search'] . "</b>";
                                     //提示重複景點無效無效
-                                    if ($_GET['repeat'] == true) {
-                                        $checksql = "SELECT `view_id` FROM `sight` where view_name='" . $view_name . "' group by `view_name` having count(1)";
+                                    if ($_GET['repeat'] == true || isset($_GET['mode']) || isset($_GET['search'])) {
+                                        $checksql = "SELECT `view_id` FROM `sight` where status=1 and view_name='" . $view_name . "'  group by `view_name` having count(1)";
                                         $checkresult = mysqli_query($con, $checksql);
                                         $checkrow = mysqli_fetch_assoc($checkresult);
-                                        $checkid = $checkrow['view_id'];
+                                        if (!empty($checkrow))
+                                            $checkid = $checkrow['view_id'];
+                                        else
+                                            $checkid = $view_id;
                                     }
                                 ?>
                                     <tr align="center" valign="center">
                                         <th><?php echo $s; ?></th>
                                         <th><?php echo $view_id; ?></th>
-                                        <th><?php
-                                            echo "<a href=";
-                                            //景點鏈結顯示
-                                            if ($source == 0) {
-                                                echo "https://www.instagram.com/p/";
-                                            }
-                                            if ($source == 1) {
-                                                if (strpos($shortcode, "http") !== false) {
-                                                    echo ("");
-                                                } else {
-                                                    echo $facebooklink;
-                                                }
-                                            }
-                                            echo $shortcode . ">" . str_ireplace($_GET['search'], $a, $view_name)  . "</a>"; ?></th>
+                                        <th>
+                                            <nobr><?php
+                                                    echo "<a href=";
+                                                    //景點鏈結顯示
+                                                    if ($source == 0) {
+                                                        echo "https://www.instagram.com/p/";
+                                                    }
+                                                    if ($source == 1) {
+                                                        if (strpos($shortcode, "http") !== false) {
+                                                            echo ("");
+                                                        } else {
+                                                            echo $facebooklink;
+                                                        }
+                                                    }
+                                                    echo $shortcode . ">" . str_ireplace($_GET['search'], $a, $view_name)  . "</a>"; ?></nobr>
+                                        </th>
                                         <th><?php echo $shortcode; ?></th>
                                         <th><?php if (isset($timestamp)) {
                                                 echo  date("Y-m-d H:i:s", $timestamp);
                                             } else {
                                                 echo "";
                                             } ?></th>
-                                        <th><?php echo "<a href=?tag=" . $tag_area . ">" . $tag_area . "</a>";  ?></th>
+                                        <th><?php echo "<a href=?tag=" . $tag_area;
+                                            if (isset($_GET['mode'])) {
+                                                echo "&mode=" . $_GET['mode'];
+                                            }
+                                            echo ">" . $tag_area . "</a>";  ?></th>
                                         <?php if (isset($on)) { ?>
                                             <th>
-                                                <?php if ($status == null) echo "<a href=?mode=1" . $facebookgetlink . "&confirm=" . intval($view_id) . ">✔️</a>";  ?>
+                                                <?php if ($status == null && empty($checkrow)) {
+                                                    echo "<a href=?";
+                                                    if (isset($_GET["mode"]))
+                                                        echo "mode=" . $_GET["mode"];
+                                                    if (isset($_GET['search'])) {
+                                                        if (isset($_GET["mode"])) {
+                                                            echo "&";
+                                                        }
+                                                        echo "search=" . $_GET['search'];
+                                                    }
+                                                    if (isset($_GET["repeat"])) {
+                                                        echo "repeat=true";
+                                                        if (isset($_GET["page"])) {
+                                                            echo "&page=" . $_GET["page"];
+                                                        }
+                                                    }
+                                                    echo $facebookgetlink . "&confirm=" . intval($view_id) . ">✔️</a>";
+                                                }
+                                                if ($status == null && !empty($checkrow)) echo "🚫";  ?>
                                             </th>
                                         <?php } ?>
                                         <th><?php echo "<a href=modifysights.php?view_id=" . intval($view_id) . "> 📝</a>" ?></th>
-                                        <th><?php echo "<a href=?delete=" . intval($view_id) . "> ❌</a>";  ?></th>
-                                        <?php if ($_GET['repeat'] == true) { ?>
+                                        <th><?php echo "<a href=?";
+                                            if (isset($_GET["mode"]))
+                                                echo "mode=" . $_GET["mode"];
+                                            if (isset($_GET['search'])) {
+                                                if (isset($_GET["mode"])) {
+                                                    echo "&";
+                                                }
+                                                echo "search=" . $_GET['search'];
+                                            }
+                                            if (isset($_GET["repeat"])) {
+                                                echo "repeat=true";
+                                                if (isset($_GET["page"])) {
+                                                    echo "&page=" . $_GET["page"];
+                                                }
+                                            }
+                                            echo "&delete=" . intval($view_id) . "> ❌</a>";  ?></th>
+                                        <?php if ($_GET['repeat'] == true || isset($_GET['mode']) || isset($_GET['search'])) { ?>
                                             <td>
                                                 <?php if ($view_id != $checkid) {
                                                     echo "<b style='color:red;'><nobr>景點重複<br>無法顯示</nobr></b>";

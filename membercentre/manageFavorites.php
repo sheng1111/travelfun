@@ -11,12 +11,14 @@ if (isset($_SESSION['user_id'])) {
 //刪除收藏
 $delsql = "DELETE FROM`favorites` WHERE `user_id`= '$user_id'  and `view_id` = " . $_GET['delete'];;
 if (isset($_GET['delete'])) {
-    if (mysqli_query($con, $delsql))
-        if (header("Location:manageFavorites.php")) {
-            echo "<script> alert('刪除成功'); </script>";
-        } else {
-            echo "<script> alert('刪除失敗'); </script>";
-        }
+    if (isset($_GET['page'])) {
+        $pageurl = "?page=" . $_GET['page'];
+    }
+    if (mysqli_query($con, $delsql)) {
+        header("Location:manageFavorites.php$pageurl");
+    } else {
+        echo "<script> alert('刪除失敗'); </script>";
+    }
 }
 //顯示收藏
 $sql = "SELECT favorites.view_id,sight.view_name,sight.shortcode,sight.tag_area ";
@@ -115,11 +117,97 @@ if ($total_records != 0)
                 $j = 1;
                 while ($row = mysqli_fetch_assoc($result) and $j <= $records_per_page) {
                     $view_id = $row["view_id"];
+                    switch ($row["tag_area"]) {
+                        case "keelung":
+                        case "Keelung": //1
+                            $tagname = "基隆";
+                            break;
+                        case "taipei":
+                        case "Taipei": //2
+                            $tagname = "台北";
+                            break;
+                        case "Taoyuan":
+                        case "taoyuan": //3
+                            $tagname = "桃園";
+                            break;
+                        case "Yilan":
+                        case "yilan": //4
+                            $tagname = "宜蘭";
+                            break;
+                        case "Hsinchu":
+                        case "hsinchu": //5
+                            $tagname = "新竹";
+                            break;
+                        case "Miaoli":
+                        case "miaoli": //6
+                            $tagname = "苗栗";
+                            break;
+                        case "Taichung":
+                        case "taichung": //7
+                            $tagname = "台中";
+                            break;
+                        case "Changhua":
+                        case "changhua": //8
+                            $tagname = "彰化";
+                            break;
+                        case "Yunlin":
+                        case "yunlin": //9
+                            $tagname = "雲林";
+                            break;
+                        case "Nantou":
+                        case "nantou": //10
+                            $tagname = "南投";
+                            break;
+                        case "Chiayi":
+                        case "chiayi": //11
+                            $tagname = "嘉義";
+                            break;
+                        case "Tainan":
+                        case "tainan": //12
+                            $tagname = "台南";
+                            break;
+                        case "Kaohsiung":
+                        case "kaohsiung": //13
+                            $tagname = "高雄";
+                            break;
+                        case "Pingtung":
+                        case "pingtung": //14
+                            $tagname = "屏東";
+                            break;
+                        case "Hualien":
+                        case "hualien": //15
+                            $tagname = "花蓮";
+                            break;
+                        case "Taitung":
+                        case "taitung": //16
+                            $tagname = "台東";
+                            break;
+                        case "Penghu":
+                        case "penghu": //17
+                            $tagname = "澎湖";
+                            break;
+                        case "Kinmen":
+                        case "kinmen": //18
+                            $tagname = "金門";
+                            break;
+                        case "mazu":
+                        case "Mazu": //19
+                            $tagname = "馬祖";
+                            break;
+                        default:
+                            $tagname = $row["tag_area"];
+                            break;
+                    }
+
                     echo "<div >";
                     echo "<h4><a href='https://www.instagram.com/p/" . $row["shortcode"] . "' style='text-decoration:none; color:black;'>" . $row["view_name"] . "</a>";
-                    echo "<a href=?delete=" . intval($view_id) . "> <font size='3'>❌</a></font></h4>";
+                    echo "<a href=?";
+                    if (isset($_GET['page'])) {
+                        echo "page=" . $_GET['page'] . "&";
+                    }
+                    echo "delete=" . intval($view_id) . "> <font size='3'>❌</a></font></h4>";
                     echo "<p>   <font color='#A6A6A6' size='1'>";
-                    echo "TAG:<a href='https://www.instagram.com/explore/tags/" . $row["tag_area"] . "' style='text-decoration:none; color:#A6A6A6;'>" . $row["tag_area"] . "&emsp; </a> ";
+                    echo "TAG:<a href='https://www.instagram.com/explore/tags/" . $row["tag_area"] . "' style='text-decoration:none; color:#A6A6A6;'>" . $tagname . "&emsp; </a> ";
                     echo  "</p> </font>";
                     echo "</div>";
                     echo "<hr>";

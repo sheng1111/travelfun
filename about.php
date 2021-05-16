@@ -222,10 +222,10 @@ if (isset($_GET['del'])) {
                                                                                         } else {
                                                                                             echo "等待";
                                                                                         } ?>成為好友" onclick="location.href='about.php?id=<?php echo $_GET['id']; ?> <?php if ($others == $_SESSION['user_id']) {
-                                                                                                                                                                                                                                            echo "&Approved_id=" . $friendid;
-                                                                                                                                                                                                                                        } else {
-                                                                                                                                                                                                                                            echo "&del=" . $friendid;
-                                                                                                                                                                                                                                        } ?>'" />
+                                                                                                                                                                        echo "&Approved_id=" . $friendid;
+                                                                                                                                                                    } else {
+                                                                                                                                                                        echo "&del=" . $friendid;
+                                                                                                                                                                    } ?>'" />
                         <?php }
                         } ?>
                         <?php
@@ -344,28 +344,5 @@ if (isset($_GET['del'])) {
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
 </body>
-
-<div class="modal fade bd-example-modal-sm" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-sm" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <center>
-                    <h5 class="modal-title" id="exampleModalLabel">請問您要尋找誰?</h5>
-                </center>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">關閉</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-</html>
 
 </html>
