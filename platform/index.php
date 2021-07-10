@@ -6,8 +6,7 @@ if (isset($_SESSION['user_id'])) {
 	$sql = "SELECT Authority FROM user WHERE user_id = '" . $_SESSION["user_id"] . "'";
 	$result = mysqli_query($con, $sql);
 	$row = mysqli_fetch_assoc($result);
-	if (!empty($row)) {
-		$_SESSION['Authority'] = $row['Authority'];
+	if ($row['Authority']==2) {
 		//顯示主功能頁面
 	} else {
 		header("Location:../index.php");
@@ -15,6 +14,67 @@ if (isset($_SESSION['user_id'])) {
 } else {
 	header("Location: ../login.php");
 }
+//(附加功能)將好友編號重置
+if(isset($_GET["resetfriendid"])){
+    $resetsearchsql="SELECT * FROM `friend` ORDER BY `friend_id` ASC";
+    $resetsearchresult = mysqli_query($con, $resetsearchsql);
+    $s=1;
+    while ($rowout = mysqli_fetch_assoc($resetsearchresult)) {
+    $resetsql="UPDATE `friend` SET `friend_id`='".$s."' WHERE `friend_id`='".$rowout['friend_id']."'";
+    mysqli_query($con, $resetsql);
+    $s++;
+    }
+    header("Location:index.php");
+}
+//(附加功能)將行程編號重置
+if(isset($_GET["resetitineraryid"])){
+    $resetsearchsql="SELECT * FROM `itinerary` ORDER BY `itinerary_id` ASC";
+    $resetsearchresult = mysqli_query($con, $resetsearchsql);
+    $s=1;
+    while ($rowout = mysqli_fetch_assoc($resetsearchresult)) {
+    $resetsql="UPDATE `itinerary` SET `itinerary_id`='".$s."' WHERE `itinerary_id`='".$rowout['itinerary_id']."'";
+    mysqli_query($con, $resetsql);
+    $s++;
+    }
+    header("Location:index.php");
+}
+//(附加功能)將順序編號重置
+if(isset($_GET["resetsequenceid"])){
+    $resetsearchsql="SELECT * FROM `sequence` ORDER BY `sequence_id` ASC";
+    $resetsearchresult = mysqli_query($con, $resetsearchsql);
+    $s=1;
+    while ($rowout = mysqli_fetch_assoc($resetsearchresult)) {
+    $resetsql="UPDATE `sequence` SET `sequence_id`='".$s."' WHERE `sequence_id`='".$rowout['sequence_id']."'";
+    mysqli_query($con, $resetsql);
+    $s++;
+    }
+    header("Location:index.php");
+}
+//(附加功能)將分享編號重置
+if(isset($_GET["resetshareid"])){
+    $resetsearchsql="SELECT * FROM `share` ORDER BY `share_id` ASC";
+    $resetsearchresult = mysqli_query($con, $resetsearchsql);
+    $s=1;
+    while ($rowout = mysqli_fetch_assoc($resetsearchresult)) {
+    $resetsql="UPDATE `share` SET `share_id`='".$s."' WHERE `share_id`='".$rowout['share_id']."'";
+    mysqli_query($con, $resetsql);
+    $s++;
+    }
+    header("Location:index.php");
+}
+//(附加功能)將景點編號重置
+if(isset($_GET["resetviewid"])){
+    $resetsearchsql="SELECT * FROM `sight` ORDER BY `view_id` ASC";
+    $resetsearchresult = mysqli_query($con, $resetsearchsql);
+    $s=1;
+    while ($rowout = mysqli_fetch_assoc($resetsearchresult)) {
+    $resetsql="UPDATE `sight` SET `view_id`='".$s."' WHERE `view_id`='".$rowout['view_id']."'";
+    mysqli_query($con, $resetsql);
+    $s++;
+    }
+    header("Location:index.php");
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -45,7 +105,7 @@ if (isset($_SESSION['user_id'])) {
 				<div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
 					<ul class="navbar-nav">
 						<?php if (isset($_SESSION['user_id'])) { ?>
-							<li class="nav-item p-0"><a class="nav-link disabled">Hi, <?php echo $_SESSION['user_name']; ?>!</a></li>
+							<li class="nav-item p-0"><a class="nav-link " onclick="$('#exampleModal2').modal('show')">Hi, <?php echo $_SESSION['user_name']; ?>!</a></li>
 						<?php } else  ?>
 						<li class="nav-link p-0"> <a class="nav-link" href="../logout.php"><img src="../image/logout.png" alt="登出" height="25" width="25"></a> </li>
 					</ul>
@@ -114,15 +174,12 @@ if (isset($_SESSION['user_id'])) {
 	<script src='https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js'></script>
 	<script type="text/javascript" src="../js/platform_style.js"></script>
 </body>
-
 <!-- 執行程式(地點選擇) -->
 <div class="modal fade bd-example-modal-sm" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
 	<div class="modal-dialog modal-sm" role="document">
 		<div class="modal-content">
 			<div class="modal-header">
-				<center>
 					<h5 class="modal-title" id="exampleModalLabel">地點</h5>
-				</center>
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 					<span aria-hidden="true">&times;</span>
 				</button>
@@ -204,11 +261,47 @@ if (isset($_SESSION['user_id'])) {
 					<h5><a href='run.php?tag=Mazu'>馬祖</a></h5>
 				</center>
 			</div>
-			<!--<div class="modal-footer">
-	  	<center><button type="button" class="btn btn-primary btn-rounded">關閉</button><center>
-      </div>-->
+			<div class="modal-footer">
+	  		<button type="button" class="btn btn-block btn-primary btn-rounded" data-dismiss="modal" aria-label="Close">關閉</button>
+      		</div>
 		</div>
 	</div>
 </div>
-
+<!-- 執行程式(功能選擇) -->
+<div class="modal fade bd-example-modal-sm" id="exampleModal2" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel2" aria-hidden="true">
+	<div class="modal-dialog modal-sm" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+					<h5 class="modal-title" id="exampleModalLabel">重編資料庫</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<center>
+					<h5><a href='index.php?resetfriendid=true'>好友編號重編</a></h5>
+				</center>
+				<hr>
+				<center>
+					<h5><a href='index.php?resetitineraryid=true'>行程編號重編</a></h5>
+				</center>
+				<hr>
+				<center>
+					<h5><a href='index.php?resetsequenceid=true'>順序編號重編</a></h5>
+				</center>
+				<hr>
+				<center>
+					<h5><a href='index.php?resetshareid=true'>分享編號重編</a></h5>
+				</center>
+				<hr>
+				<center>
+					<h5><a href='index.php?resetviewid=true'>景點編號重編</a></h5>
+				</center>
+			</div>
+			<div class="modal-footer">
+	  		<button type="button" class="btn btn-block btn-primary btn-rounded" data-dismiss="modal" aria-label="Close">關閉</button>
+      		</div>
+		</div>
+	</div>
+</div>
 </html>
