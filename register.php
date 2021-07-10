@@ -46,17 +46,24 @@ if (isset($_POST['signup'])) {
 
 
     if (!$error) {
+        if($mailfunction==1){
         $sql = "INSERT INTO `user`(`user_id`, `user_name`, `user_email`, `user_password`, `user_key`) VALUES
-		('" . $key_id . "', '" . $username . "','" . $useremail . "','" . $userpassword . "', '" . $random . "')";
+		('" . $key_id . "', '" . $username . "','" . $useremail . "','" . hash('sha512',base64_encode($userpassword)) . "', '" . $random . "')";}
+        else
+        { $sql = "INSERT INTO `user`(`user_id`, `user_name`, `user_email`, `user_password`, `user_key`,`Authority`) VALUES
+            ('" . $key_id . "', '" . $username . "','" . $useremail . "','" . hash('sha512',base64_encode($userpassword)) . "', '" . $random . "',1)";}
         if (mysqli_query($con, $sql)) {
+            if($mailfunction==1){
             $title = "TravelFun會員驗證信件";
             $content = '<span style="color:red">** 本郵件由系統自動發送，請勿直接回覆 **</span> <p>' . $username . '，您好! <br>'
                 . "請點選下方「驗證」按鈕完成驗證:<br>"
-                . "<a href='127.0.0.1:8000/travelfun_test/membercentre/verification.php?key=" . $random . "' style='text-decoration:none; color:black;'> 驗證 </a>" . '<p><p><span style="color:#878787">--</span>
-            <br><span style="color:#878787">Best Regard</span><br>
-            <span style="color:#878787">TravelFun團隊</span>';
-            $result = "<script> alert('成功寄出密碼');parent.location.href='login.php'; </script>";
-            sendmail($username, $useremail, $title, $content, $result);
+                . "<a href='127.0.0.1/travelfun/membercentre/memberverification.php?key=" . $random . "' style='text-decoration:none; color:black;'> 驗證 </a><p>" 
+                . "如按鈕點擊無效，請直接點選連結: 127.0.0.1/travelfun/membercentre/memberverification.php?key=" . $random
+                . "<p><span style='color:#878787'>--</span>"
+                . "<br><span style='color:#878787'>Best Regard</span><br>";
+            $result = "<script> alert('請至信箱完成驗證');parent.location.href='login.php'; </script>";
+            sendmail($username, $useremail, $title, $content, $result);}
+            else{echo "<script> alert('註冊成功');parent.location.href='login.php'; </script>";}
         } else {
             $errormsg = "註冊失敗，請重新註冊一次!";
         }
@@ -151,15 +158,6 @@ if (isset($_POST['signup'])) {
             <span class="text-danger"><?php if (isset($errormsg)) {
                                             echo $errormsg;
                                         } ?></span>
-            <div class="text-center">
-                <!--
-                        <p>or sign up with:</p>
-                        <a type="button" class="light-blue-text mx-2"><i class="fab fa-facebook-f"></i></a>
-                        <a type="button" class="light-blue-text mx-2"><i class="fab fa-twitter"></i></a>
-                        <a type="button" class="light-blue-text mx-2"><i class="fab fa-linkedin-in"></i></a>
-                        <a type="button" class="light-blue-text mx-2"><i class="fab fa-github"></i></a>
-                         -->
-            </div>
             </form>
         </div>
         </div>
