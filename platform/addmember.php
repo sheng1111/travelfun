@@ -5,17 +5,16 @@ include '../function.php';
 include '../sendmail.php';
 //使用者登入情況下可自動賦予管理權限
 if (isset($_SESSION['user_id'])) {
-    $sql = "SELECT Authority FROM user WHERE user_id = '" . $_SESSION["user_id"] . "'";
-    $result = mysqli_query($con, $sql);
-    $row = mysqli_fetch_assoc($result);
-    if (!empty($row)) {
-        $_SESSION['Authority'] = $row['Authority'];
-        //顯示主功能頁面
-    } else {
-        header("Location:../index.php");
-    }
+	$sql = "SELECT Authority FROM user WHERE user_id = '" . $_SESSION["user_id"] . "'";
+	$result = mysqli_query($con, $sql);
+	$row = mysqli_fetch_assoc($result);
+	if ($row['Authority']==2) {
+		//顯示主功能頁面
+	} else {
+		header("Location:../index.php");
+	}
 } else {
-    header("Location: ../login.php");
+	header("Location: ../login.php");
 }
 //check if form is submitted
 if (isset($_POST['signup'])) {

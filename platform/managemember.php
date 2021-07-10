@@ -11,17 +11,16 @@ $id = strip_tags($_GET['id']);
 unset($_SESSION['do']);
 //使用者登入情況下可自動賦予管理權限
 if (isset($_SESSION['user_id'])) {
-    $sql = "SELECT Authority FROM user WHERE user_id = '" . $_SESSION["user_id"] . "'";
-    $result = mysqli_query($con, $sql);
-    $row = mysqli_fetch_assoc($result);
-    if (!empty($row)) {
-        $_SESSION['Authority'] = $row['Authority'];
-        //顯示主功能頁面
-    } else {
-        header("Location:../index.php");
-    }
+	$sql = "SELECT Authority FROM user WHERE user_id = '" . $_SESSION["user_id"] . "'";
+	$result = mysqli_query($con, $sql);
+	$row = mysqli_fetch_assoc($result);
+	if ($row['Authority']==2) {
+		//顯示主功能頁面
+	} else {
+		header("Location:../index.php");
+	}
 } else {
-    header("Location: ../login.php");
+	header("Location: ../login.php");
 }
 
 //呈現會員資料
@@ -216,9 +215,11 @@ if (isset($_GET['delete'])) {
                                     <td>
                                         <nobr>身分</nobr>
                                     </td>
+                                    <?php if($mailfunction==1) {?>
                                     <td>
                                         <nobr>密碼修改</nobr>
                                     </td>
+                                    <?php }?>
                                     <td>
                                         <nobr>修改</nobr>
                                     </td>
@@ -256,9 +257,11 @@ if (isset($_GET['delete'])) {
                                                 }
                                             }
                                             ?></th>
+                                            <?php if($mailfunction==1) {?>
                                         <th><?php if ($user_name != $_SESSION['user_id']) {
                                                 echo "<a href=?send=" . $user_id . ">✉️ </a>";
                                             }  ?></th>
+                                            <?php }?>
                                         <th><?php if ($user_name != $_SESSION['user_id']) {
                                                 echo "<a href=modifymember.php?id=" . $user_id . "> 📝</a>";
                                             } ?></th>

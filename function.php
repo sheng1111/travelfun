@@ -36,9 +36,6 @@ $facebooklink='https://www.facebook.com/photo?fbid=';
 $addressmodifyswitch=0;
 //result的googlemap按鈕開關
 $googlemapswitch=1;
-//url轉換
-
-//地區資料庫語法
-if($_GET["tagname"]=="")
-{}
+//mail功能開關(0為關,1為開)
+$mailfunction=1;
 ?>

@@ -120,12 +120,13 @@ if (isset($_GET['delid'])) {
     }
 }
 //讀取行程名稱
-$result = mysqli_query($con, "SELECT `itinerary_name`,`public_status`,`itinerary_date`,`itinerary_days`  FROM itinerary WHERE itinerary_id=" . $id);
+$result = mysqli_query($con, "SELECT `itinerary_name`,`public_status`,`itinerary_date`,`itinerary_days`,`user_id`  FROM itinerary WHERE itinerary_id=" . $id);
 $row = mysqli_fetch_assoc($result);
 $itinerary_name = $row["itinerary_name"];
 $public_status = $row["public_status"];
 $itinerary_days = $row["itinerary_days"];
 $itinerary_date = $row["itinerary_date"];
+$user_id = $row["user_id"];
 
 //讀取共筆作者
 $sql = "SELECT share.share_id,share.user_id,user.user_name ";
@@ -148,7 +149,15 @@ $sql3 .= " WHERE friend.others= '" . $_SESSION['user_id'] . "' and friend.status
 $sql3 .= " friend.oneself = user.user_id";
 $result4 = mysqli_query($con, $sql3);
 $total_records2 = mysqli_num_rows($result4);
+//鏈結產生網址
+$garbled=md5(base64_encode('d>-2Q:cZ').'Pe7"4K*R');
+$itinerarycode=md5(base64_encode($id)."|X,bWzgE?$<x");
+$authorcode=md5(base64_encode($user_id)."v^}ns|hv@Ra|");
+$garbled2=md5(base64_encode('V5xh37MBsV4hHzHt98Nfvnddz8b7NTq8ehFue8GRZneWDk5ZWnUnGgnruAUyqfvuC69yekQWqUDZEe7AUZzuH5WSDXWsz76krZd6t3xBX9U46VeTY639wRKRQpTq5PS9').'Pe7"4K*Racxx3');
+$key0=$garbled.$itinerarycode.$authorcode.$garbled2;
+$key=hash('sha256', $key0);
 ?>
+
 <html>
 
 <head>
@@ -159,7 +168,6 @@ $total_records2 = mysqli_num_rows($result4);
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
     <link rel="stylesheet" href="../css/mdb.min.css">
     <link rel='stylesheet' href='https://rawgit.com/adrotec/knockout-file-bindings/master/knockout-file-bindings.css'>>
-    <script src="https://cdn.ckeditor.com/4.15.1/standard/ckeditor.js"></script>
     <link rel="stylesheet" href="../css/result.css">
 </head>
 
@@ -270,7 +278,7 @@ $total_records2 = mysqli_num_rows($result4);
                         }
                         ?>
                     </select>
-                    <button class="btn btn-sm btn-primary" type="submit" name="submit_addfriend">新增共筆作者</button>
+                    <button class="btn btn-sm btn-primary" type="submit" name="submit_addfriend">新增共筆作者</button> 
                 </div>
             </form>
             <table class="table">
@@ -300,6 +308,8 @@ $total_records2 = mysqli_num_rows($result4);
                     ?>
                 </tbody>
             </table>
+            分享鏈結:<input value="<?php echo "http://127.0.0.1:8000/travelfun/share.php?id=".$id."&key=".$key;?>">
+            
         </div>
         </div>
     </main>

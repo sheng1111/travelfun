@@ -22,20 +22,16 @@ if (isset($_POST['change'])) {
         $error = true; {
             echo "<script> alert('你的密碼不能小於6碼喔!');parent.location.href='forgot_password.php?key=" . $key . "'; </script>";
         }
-        //$password_error = "你的密碼不能小於6碼喔!";
-        //header("Location: forgot_password.php?key=" . $key . "");
     }
     if ($userpassword != $checkpassword) {
         $error = true; {
             echo "<script> alert('兩次密碼輸入要相同喔!');parent.location.href='forgot_password.php?key=" . $key . "'; </script>";
         }
-        //$cpassword_error = "兩次密碼輸入要相同喔!";
-        //header("Location: forgot_password.php?key=" . $key . "");
     }
     if (!$error) {
         $random = random_string(32, '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
         $sqlUpdate = "UPDATE user SET
-        user_password='" . $userpassword . "',
+        user_password='" . hash('sha512',base64_encode($userpassword)) . "',
         user_key='" . $random . "',
         Authority=1
         WHERE `user_key` = '" . $key . "'";

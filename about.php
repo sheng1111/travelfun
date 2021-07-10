@@ -135,11 +135,10 @@ if (isset($_GET['del'])) {
     $delid = strip_tags($_GET['del']);
     $delfriendsql = "DELETE FROM`friend` WHERE `friend_id` = " . $delid . " and oneself='" . $_SESSION['user_id'] . "' or others='" . $_SESSION['user_id'] . "'"; //刪除好友
     mysqli_query($con, $delfriendsql);
-    if (isset($_GET['id'])) {
-        header("Location:about.php?id=" . $_GET['id']);
-    } else {
-        header("Location:about.php");
-    }
+    if(isset($_GET['Approved'])){$Approvedurl="Approved=true";}
+    if(isset($_GET['Approved'])&&isset($_GET['id'])){$and="&";}
+    if(isset($_GET['id'])){$idurl="id=".$id;}
+        header("Location:about.php?$Approvedurl$and$idurl");
 }
 ?>
 <!DOCTYPE html>
@@ -242,7 +241,7 @@ if (isset($_GET['del'])) {
                     </center>
                     <hr>
                     電子郵件:<?php echo " <a href='mailto:" . $email . "'><font color='black'>" . $email . "</font></a>"; ?> <br>
-                    個人簡介:<?php echo $introduction; ?> <br>
+                    個人簡介:<?php echo $introduction.$addfriendsql; ?> <br>
                     <hr>
                 <?php } ?>
                 <h4 class='text-center card-title'><b><?php echo $place; ?></b></h4>
@@ -290,8 +289,11 @@ if (isset($_GET['del'])) {
                                             <?php if ($id == $_SESSION['user_id'] && isset($_GET['Approved'])) { ?>
                                                 <th><a href=?Approved_id=<?php echo $friend_id; ?>>✔</a></th>
                                             <?php } ?>
-                                            <?php if ($id == $_SESSION['user_id']) { ?>
-                                                <th><a href=?del=<?php echo $friend_id; ?>>❌</a></th>
+                                            <?php if ($id == $_SESSION['user_id']) {
+                                                    if(isset($_GET['Approved'])){$Approvedurl="Approved=true&";}
+                                                    if(isset($_GET['id'])){$idurl="id=".$id."&";} ?>
+                                            
+                                                <th><a href=?<?php echo $Approvedurl.$idurl; ?>del=<?php echo $friend_id; ?>>❌</a></th>
                                             <?php } ?>
                                         </tr>
 

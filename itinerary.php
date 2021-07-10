@@ -233,7 +233,7 @@ if ($day >= $itinerary_days) {
                                                                                                                                                                                             echo intval($r2id);
                                                                                                                                                                                         }
                                                                                                                                                                                         if (!empty($row1)) echo "&share=1";
-                                                                                                                                                                                    } ?>'" />
+                                                                                                                                                                                    } ?> <?php if(!empty($row) || !empty($row1)) { ?>'"/> <?php } ?>
                                             </td>
                                         <?php } ?>
                                         <td>

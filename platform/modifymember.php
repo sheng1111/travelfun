@@ -7,8 +7,7 @@ if (isset($_SESSION['user_id'])) {
 	$sql = "SELECT Authority FROM user WHERE user_id = '" . $_SESSION["user_id"] . "'";
 	$result = mysqli_query($con, $sql);
 	$row = mysqli_fetch_assoc($result);
-	if (!empty($row)) {
-		$_SESSION['Authority'] = $row['Authority'];
+	if ($row['Authority']==2) {
 		//顯示主功能頁面
 	} else {
 		header("Location:../index.php");
@@ -27,12 +26,14 @@ $row = mysqli_fetch_assoc($result);
 $useremail = $row["user_email"];
 $username = $row["user_name"];
 $Authority = $row["Authority"];
+$databasepassword = $row["user_password"];
 
 if (isset($_POST['submit'])) {
 	$username = strip_tags($_POST['user_name']);
 	$rowuseremail = strip_tags($_POST['rowemail']);
 	$useremail = strip_tags($_POST['user_email']);
-	$databasepassword = $row["user_password"];
+	$userpassword = hash('sha512',base64_encode(strip_tags($_POST['password'])));
+	$checkpassword = hash('sha512',base64_encode(strip_tags($_POST['checkpassword'])));
 	$Authority = strip_tags($_POST["Authority"]);
 	//檢查信箱重複
 	$check = "SELECT * FROM `user` WHERE `user_email` ='" . $useremail . "' and  `user_email`!='" . $rowuseremail . "'";
@@ -42,13 +43,24 @@ if (isset($_POST['submit'])) {
 		$error = true;
 		$email_error = "這個信箱已經有人使用過了!";
 	}
-
+	if (strlen($_POST['password']) < 6 && $_POST['checkpassword'] != "") {
+		$error = true;
+		$password_error = "你的密碼不能小於6碼喔!";
+	}
+	if ($userpassword != $checkpassword) {
+		$error = true;
+		$cpassword_error = "兩次密碼輸入要相同喔!";
+	}
+	if ($_POST['password'] == "" or $_POST['checkpassword'] == "") {
+		$userpassword = $databasepassword;
+	}
 	$random = random_string(32, '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
 
 	if (!$error) {
 		$sqlUpdate = "UPDATE user SET
 				user_email='" . $useremail . "',
 				user_name='" . $username . "',
+				user_password='" . $userpassword . "',
 				user_key='" . $random . "',
 				Authority='" . $Authority . "'
 				WHERE `user_id` = '" . $id . "'";
@@ -134,6 +146,17 @@ if (isset($_POST['submit'])) {
 												} ?>>管理員
 						</select>
 					</div>
+					<?php if($mailfunction==0) {?>
+					<div class="form-group"><label for="name">☀輸入新密碼</label>
+						<input type="password" name="password" maxlength="20" placeholder="輸入新密碼" class="form-control mb-4" />
+					</div>
+					<span class="text-danger"><?php if (isset($password_error)) echo $password_error; ?></span>
+
+					<div class="form-group"><label for="name">☀再次輸入新密碼</label>
+						<input type="password" name="checkpassword" maxlength="20" placeholder="再次輸入新密碼" class="form-control mb-4" />
+					</div>
+					<span class="text-danger"><?php if (isset($cpassword_error)) echo $cpassword_error; ?></span>
+					<?php }?>
 					<center><input class="btn btn-info btn-block my-4 btn-lg" type="button" name="button" value="回上一頁" onClick="location.href='managemember.php'"></center>
 					<center><button class="btn btn-info btn-block my-4" type="submit" name="submit">更改會員資料</button></center>
 					<span class="text-success"><?php if (isset($successmsg)) echo $successmsg; ?></span>

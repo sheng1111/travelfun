@@ -3,8 +3,7 @@ session_start();
 include_once 'dbconnect.php';
 //檢查帳號是否存在
 if (isset($_SESSION['user_id'])) {
-    $user_id = $_SESSION['user_id'];
-    $check0 = "SELECT * FROM `user` WHERE `user_id` ='" . $user_id . "'";
+    $check0 = "SELECT * FROM `user` WHERE `user_id` ='" . $_SESSION['user_id'] . "'";
     $chresult0 = mysqli_query($con, $check0);
     $row0 = mysqli_fetch_assoc($chresult0);
     if (empty($row0)) {
@@ -14,14 +13,14 @@ if (isset($_SESSION['user_id'])) {
         unset($_SESSION['Authority']);
         setcookie("user_key", "", time() - 3600);
     }
+    else{
+        $_SESSION['Authority'] =$row0["Authority"];
+    }
 }
-//檢查管理員權限
-if (isset($_SESSION['user_id'])) {
-    $user_id = $_SESSION['user_id'];
-    $check = "SELECT `Authority` FROM `user` WHERE `user_id` ='" . $user_id . "'";
-    $chresult = mysqli_query($con, $check);
-    $row2 = mysqli_fetch_assoc($chresult);
-    $_SESSION['Authority'] = $row2["Authority"];
+//若有改到user_key則會在此頁面一併更改cookie
+if(isset($_SESSION['user_key'])){
+    setcookie("user_key", $_SESSION['user_key'], time() + (60 * 60));
+    unset($_SESSION['user_key']);
 }
 ?>
 <!DOCTYPE html>

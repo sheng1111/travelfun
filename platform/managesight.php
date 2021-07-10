@@ -6,17 +6,16 @@ mysqli_query($con, "SET NAMES UTF8");
 date_default_timezone_set("Asia/Taipei");
 //使用者登入情況下可自動賦予管理權限
 if (isset($_SESSION['user_id'])) {
-    $sql = "SELECT Authority FROM user WHERE user_id = '" . $_SESSION["user_id"] . "'";
-    $result = mysqli_query($con, $sql);
-    $row = mysqli_fetch_assoc($result);
-    if (!empty($row)) {
-        $_SESSION['Authority'] = $row['Authority'];
-        //顯示主功能頁面
-    } else {
-        header("Location:../index.php");
-    }
+	$sql = "SELECT Authority FROM user WHERE user_id = '" . $_SESSION["user_id"] . "'";
+	$result = mysqli_query($con, $sql);
+	$row = mysqli_fetch_assoc($result);
+	if ($row['Authority']==2) {
+		//顯示主功能頁面
+	} else {
+		header("Location:../index.php");
+	}
 } else {
-    header("Location: ../login.php");
+	header("Location: ../login.php");
 }
 //呈現景點
 if ($_GET['repeat'] != true) {
@@ -155,10 +154,11 @@ if ($repeattotal_records > 0) {
 //回復FB標題
 if ($_GET['source'] == "FaceBook") {
     $facebookname = "FB";
+    $facebookgetlink0 = "source=FaceBook";
     $facebookgetlink = "&source=FaceBook";
 }
 //刪除景點
-$delsql = "DELETE FROM`sight` WHERE `view_id` = " . $_GET['delete'];
+$delsql = "DELETE FROM `sight` WHERE `view_id` = " . $_GET['delete'];
 if (isset($_GET['delete'])) {
     if (isset($_GET["search"])) {
         $modeurl = "search=" . $_GET["search"];
@@ -177,10 +177,29 @@ if (isset($_GET['delete'])) {
     } else
         echo "<script> alert('刪除失敗'); parent.location.href='managesight.php?" . $modeurl . $repeaturl . $facebookgetlink . "';</script>";
 }
-
+//發佈景點
 $confirmsql = "UPDATE `sight` SET `status` = '1' WHERE `view_id` = " . $_GET['confirm'];
 if (isset($_GET['confirm'])) {
     if (mysqli_query($con, $confirmsql)) {
+        if (isset($_GET["search"])) {
+            $modeurl = "search=" . $_GET["search"];
+        }
+        if (isset($_GET["mode"])) {
+            $modeurl .= "mode=" . $_GET["mode"];
+        }
+        if (isset($_GET["repeat"])) {
+            $repeaturl = "repeat=true";
+            if (isset($_GET["page"])) {
+                $repeaturl .= "&page=" . $_GET["page"];
+            }
+        }
+        header("Location:managesight.php?$modeurl$repeaturl$facebookgetlink");
+    }
+}
+//反發佈景點(修正資料庫錯誤)
+$unconfirmsql = "UPDATE `sight` SET `status` = null WHERE `view_id` = " . $_GET['unconfirm'];
+if (isset($_GET['unconfirm'])) {
+    if (mysqli_query($con, $unconfirmsql)) {
         if (isset($_GET["search"])) {
             $modeurl = "search=" . $_GET["search"];
         }
@@ -206,6 +225,122 @@ if (isset($_GET["mode"])) {
 } else {
     $echomode .= $facebookgetlink . "page=";
 }
+//(附加功能)將資料庫重複景點改為不發佈
+if(isset($_GET["repeat"])){
+    $countsql = "SELECT `view_id`, `view_name` FROM `sight` where";
+    //搜尋來源設定
+    if ($_GET['source'] == "FaceBook") {
+        $countsql .= " source=1 and";
+    } else {
+        $countsql .= " source=0 and";
+    }
+    $countsql .= " `view_name` in (SELECT `view_name` FROM `sight`";
+    //搜尋來源設定
+    if ($_GET['source'] == "FaceBook") {
+        $countsql .= " where status=1 and source=1";
+    } else {
+        $countsql .= "where status=1 and source=0";
+    }
+    $countsql .= " group by `view_name` HAVING count(`view_name`)>1)";
+    if ($_GET['source'] == "FaceBook") {
+        $countsql .= " and source=1";
+    } else {
+        $countsql .= " and source=0";
+    }
+    $countquery = mysqli_query($con, $countsql);
+    $resettotal_records = mysqli_num_rows($countquery);
+    if ($resettotal_records > 0) {
+        $resetmessage = "<b style='color:green;'>注意:目前有" . $resettotal_records . "個景點重複，部分條目可能無法顯示，請點選「<a href='?repeat=true";
+        if ($_GET['source'] == "FaceBook") {
+            $resetmessage .=  "&source=FaceBook&reset=true'>自動更改</a>」進行更改</b>";
+        } else  {
+                $resetmessage .=  "&reset=true'>自動更改</a>」進行更改</b>";
+            }
+        }
+  
+    if(isset($_GET["reset"])){
+        $s=1;
+        while ($rowout = mysqli_fetch_assoc($countquery)) {
+            $searchsql="SELECT * FROM `sight` WHERE `view_name`='".$rowout['view_name']."' ORDER BY `sight`.`view_id` ASC limit 1";
+            $searchquery = mysqli_query($con, $searchsql);
+            $out = mysqli_fetch_assoc($searchquery);
+            if($out['view_id']!=$rowout['view_id'])
+            {$resetsql="UPDATE `sight` SET `status`= null WHERE `view_id`='".$rowout['view_id']."'";
+            mysqli_query($con, $resetsql);}
+            $s++;
+        }
+        if (isset($_GET["mode"])) {
+            $modeurl .= "mode=" . $_GET["mode"];
+        }
+        if (isset($_GET["repeat"])) {
+            $repeaturl = "repeat=true";
+            if (isset($_GET["page"])) {
+                $repeaturl .= "&page=" . $_GET["page"];
+            }
+        }
+        header("Location:managesight.php?$modeurl$repeaturl$facebookgetlink");
+    }
+}
+//(附加功能)將資料庫重複景點刪除
+if(isset($_GET["repeat"])){
+    $countsql0 = "SELECT `view_id`, `view_name` FROM `sight` where";
+    //搜尋來源設定
+    if ($_GET['source'] == "FaceBook") {
+        $countsql0 .= " source=1 and";
+    } else {
+        $countsql0 .= " source=0 and";
+    }
+    $countsql0 .= " `view_name` in (SELECT `view_name` FROM `sight`";
+    //搜尋來源設定
+    if ($_GET['source'] == "FaceBook") {
+        $countsql0 .= " where status is null and source=1";
+    } else {
+        $countsql0 .= "where status is null and source=0";
+    }
+    $countsql0 .= " group by `view_name` HAVING count(`view_name`)>1)";
+    if ($_GET['source'] == "FaceBook") {
+        $countsql0 .= " and source=1";
+    } else {
+        $countsql0 .= " and source=0";
+    }
+    $countquery = mysqli_query($con, $countsql0);
+    $deltotal_records = mysqli_num_rows($countquery);
+    if ($deltotal_records > 0) {
+        $delmessage = "<b style='color:blue;'>注意:目前有" . $deltotal_records . "個景點無法發佈，請點選「<a href='?repeat=true";
+        if ($_GET['source'] == "FaceBook") {
+            $delmessage .=  "&source=FaceBook&resetdel=true'>自動刪除</a>」進行更改</b>";
+        } else  {
+                $delmessage .=  "&resetdel=true'>自動刪除</a>」進行更改</b>";
+            }
+        }
+  
+    if(isset($_GET["resetdel"])){
+        $s=1;
+        while ($rowout = mysqli_fetch_assoc($countquery)) {
+            $resetsql="DELETE FROM `sight` WHERE `view_id`='".$rowout['view_id']."' and status is null";
+            mysqli_query($con, $resetsql);
+            $s++;
+        }
+        if (isset($_GET["mode"])) {
+            $modeurl .= "mode=" . $_GET["mode"];
+        }
+        if (isset($_GET["repeat"])) {
+            $repeaturl = "repeat=true";
+            if (isset($_GET["page"])) {
+                $repeaturl .= "&page=" . $_GET["page"];
+            }
+        }
+        $resetsearchsql="SELECT * FROM `sight` ORDER BY `view_id` ASC";
+        $resetsearchresult = mysqli_query($con, $resetsearchsql);
+        $s=1;
+        while ($rowout = mysqli_fetch_assoc($resetsearchresult)) {
+        $resetsql="UPDATE `sight` SET `view_id`='".$s."' WHERE `view_id`='".$rowout['view_id']."'";
+        mysqli_query($con, $resetsql);
+        $s++;
+        }
+        header("Location:managesight.php?$modeurl$repeaturl$facebookgetlink");
+    }
+}  
 ?>
 
 
@@ -267,7 +402,7 @@ if (isset($_GET["mode"])) {
                                         <nobr><input style="white-space:nowrap" class="btn btn-info btn-block btn-sm" type="button" value="切換暫存區" onclick="location.href='managesight.php?mode=2<?php echo $facebookgetlink; ?>'" />
                                     </td>
                                     </nobr><?php } ?>
-                                <?php if ($_GET['repeat'] == true) { ?> <td><input style="white-space:nowrap" class="btn btn-info btn-block btn-sm" type="button" value="切換景點管理" onclick="location.href='managesight.php<?php if ($_GET['source'] == "FaceBook") echo "?" . $facebookgetlink; ?>'" /></td> <?php } else { ?>
+                                <?php if ($_GET['repeat'] == true) { ?> <td><input style="white-space:nowrap" class="btn btn-info btn-block btn-sm" type="button" value="切換景點管理" onclick="location.href='managesight.php<?php if ($_GET['source'] == "FaceBook") echo "?" . $facebookgetlink0; ?>'" /></td> <?php } else { ?>
                                     <td><input style="white-space:nowrap" class="btn btn-info btn-block btn-sm" type="button" value="尋找重複名稱" onclick="location.href='managesight.php?repeat=true<?php if ($_GET['source'] == "FaceBook") echo $facebookgetlink; ?>'" /></td> <?php } ?>
                                 <?php if ($facebookswitch == 1) {
                                     if ($_GET['source'] == "FaceBook") { ?><td><input style="white-space:nowrap" class="btn btn-primary btn-block btn-sm" type="button" value="切換IG資料庫" onclick="location.href='?source=Instagram'" /></td> <?php } else { ?>
@@ -281,11 +416,9 @@ if (isset($_GET["mode"])) {
                                 </td>
                             </tr>
                         </table>
-                        <span class="text-danger"><?php if (!isset($_GET['repeat'])) {
-                                                        if (isset($repeatmessage)) {
-                                                            echo $repeatmessage;
-                                                        }
-                                                    } ?></span>
+                        <span class="text-danger"><?php if (!isset($_GET['repeat'])) {if (isset($repeatmessage)) {echo $repeatmessage;} } 
+                                                    else {if (isset($resetmessage)) {echo $resetmessage."<br>";}
+                                                          if (isset($delmessage)) {echo $delmessage."<br>";}}?></span>
                         <table class="table">
                             <thead>
                                 <tr align="center" valign="center">
@@ -401,7 +534,26 @@ if (isset($_GET["mode"])) {
                                                     }
                                                     echo $facebookgetlink . "&confirm=" . intval($view_id) . ">✔️</a>";
                                                 }
-                                                if ($status == null && !empty($checkrow)) echo "🚫";  ?>
+                                                if ($status == null && !empty($checkrow)) echo "🚫";  
+                                                if ($status == 1 && !empty($checkrow)) {
+                                                    echo "<a href=?";
+                                                    if (isset($_GET["mode"]))
+                                                        echo "mode=" . $_GET["mode"];
+                                                    if (isset($_GET['search'])) {
+                                                        if (isset($_GET["mode"])) {
+                                                            echo "&";
+                                                        }
+                                                        echo "search=" . $_GET['search'];
+                                                    }
+                                                    if (isset($_GET["repeat"])) {
+                                                        echo "repeat=true";
+                                                        if (isset($_GET["page"])) {
+                                                            echo "&page=" . $_GET["page"];
+                                                        }
+                                                    }
+                                                    echo $facebookgetlink . "&unconfirm=" . intval($view_id) . ">↺</a>";
+                                                }
+                                                ?>
                                             </th>
                                         <?php } ?>
                                         <th><?php echo "<a href=modifysights.php?view_id=" . intval($view_id) . "> 📝</a>" ?></th>

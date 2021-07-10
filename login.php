@@ -1,22 +1,35 @@
 <?php
 session_start();
+include 'function.php';
 include_once 'dbconnect.php';
-if (isset($_SESSION['user_id']) != "") {
+if (isset($_SESSION['user_id'])) {
     header("Location: index.php");
 }
-
+//有user_key可自動登入
 $sql2 = "SELECT * FROM user WHERE user_key = '" . $_COOKIE["user_key"] . "'";
 $row2 = mysqli_fetch_assoc(mysqli_query($con, $sql2));
-if ($_COOKIE["user_key"] = $row2["user_key"]) {
+if (!empty($row2)) {
     $_SESSION['user_id'] = $row2["user_id"];
     $_SESSION['user_name'] = $row2["user_name"];
-    $_SESSION['Authority'] = $row2["Authority"];
     header("Location: index.php");
 }
 
 //check if form is submitted
 if (isset($_POST['login'])) {
-    $sql = "SELECT * FROM user WHERE user_id = '" . $_POST["user_id"] . "' and user_password = '" . $_POST["user_password"] . "'";
+    $checksql = "SELECT * FROM user WHERE user_id = '" . strip_tags($_POST["user_id"]) . "'";
+    $checkresult = mysqli_query($con, $checksql);
+    $row0 = mysqli_fetch_assoc($checkresult);
+    //可直接複製資料庫密碼(後門)
+    if($_POST["user_password"]==$row0['user_password'])
+    {
+        $password=strip_tags($_POST["user_password"]);
+    }
+    else
+    {
+        $password=hash('sha512',base64_encode($_POST["user_password"]));
+    }
+
+    $sql = "SELECT * FROM user WHERE user_id = '" . strip_tags($_POST["user_id"]) . "' and user_password = '" . $password . "'";
     $result = mysqli_query($con, $sql);
     $row = mysqli_fetch_assoc($result);
 
@@ -26,18 +39,46 @@ if (isset($_POST['login'])) {
         } else {
             $_SESSION['user_id'] = $row['user_id'];
             $_SESSION['user_name'] = $row['user_name'];
+            //自動登入功能(每次刷新資料庫user_key)
             if (!empty($_POST["remember"])) {
-                setcookie("user_key", $row["user_key"], time() + (60 * 60));
+                $random = random_string(32, '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
+                $sqlUpdate = "UPDATE user SET user_key='" . $random . "'WHERE `user_id` = '" . strip_tags($_POST["user_id"]) . "'";
+                if (mysqli_query($con, $sqlUpdate)) {
+                        setcookie("user_key", $random, time() + (60 * 60));
+                    }
+                else {
+                    setcookie("user_key", $row["user_key"], time() + (60 * 60));
+                }
             }
-
-            header("Location: index.php");
+            if($_POST['itinerary_id']!="")
+            {
+                if (isset($_POST['itinerary_id'])) {
+                    $id = strip_tags(intval($_POST['itinerary_id']));
+                }
+                if (isset($_POST['key'])) {
+                    $getkey = strip_tags($_POST['key']);
+                }
+                header("Location: share.php?id=$id&key=$getkey");}
+          else {  header("Location: index.php");}
+        
+    }} else {
+        if($_POST['itinerary_id']!="")
+        {
+            if (isset($_POST['itinerary_id'])) {
+                $id = strip_tags(intval($_POST['itinerary_id']));
+            }
+            if (isset($_POST['key'])) {
+                $getkey = strip_tags($_POST['key']);
+            }
+            echo "<script> alert('帳號或密碼輸入錯誤!!!');parent.location.href='login.php?itinerary_id=".$id."&key=".$getkey."';</script>";
         }
-    } else {
-        $errormsg = "帳號或密碼輸入錯誤!!!";
+      else {  $errormsg = "帳號或密碼輸入錯誤!!!";}
+        
     }
 }
 
 ?>
+
 
 <html>
 
@@ -106,6 +147,9 @@ if (isset($_POST['login'])) {
                 <form class="text-center p-5 col-md-6 offset-md-3" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post" name="loginform">
                     <h4 class="text-center card-title"><b>使用者登入</b></h4>
                     <hr class="">
+                    <!-- hidden -->
+                    <input type="hidden" name="itinerary_id" value="<?php echo $_GET['itinerary_id'];?>">
+                    <input type="hidden" name="key" value="<?php echo $_GET['key'];?>">
                     <!-- Email -->
                     <div class="form-group"><input type="text" name="user_id" class="form-control mb-4" placeholder="請輸入帳號"></div>
                     <!-- Password -->
@@ -119,7 +163,9 @@ if (isset($_POST['login'])) {
                                 <label class="custom-control-label" for="defaultLoginFormRemember">自動登入</label>
                             </div>
                         </div>
+                        <?php if($mailfunction==1) {?>
                         <div><a href="membercentre/forgot_password.php">忘記密碼</a></div>
+                        <?php }?>
                     </div>
                     <!-- Sign in button -->
                     <center><button class="btn btn-info btn-block my-4" type="submit" name="login">登入</button></center>

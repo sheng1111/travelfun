@@ -22,7 +22,9 @@ if (!empty($_GET["id"])) {
 if (!empty($_GET["id"])) {
     $sql = "SELECT `itinerary`.`itinerary_id`, `itinerary`.`itinerary_name`, `itinerary`.`public_status`, `itinerary`.`itinerary_date`, `itinerary_days`, `itinerary`.`user_id` ,`user`.`user_name` ";
     $sql .= " FROM `itinerary`,`user`";
-    $sql .= " WHERE itinerary.user_id='" . $id . "' and ";
+    $sql .= " WHERE";
+    //$sql .=" itinerary_id in (select itinerary_id from share where user_id='".$_SESSION['user_id']."')";
+    $sql .= " itinerary.user_id='" . $id . "' and ";
     $sql .= " `itinerary`.`user_id`= `user`.`user_id` and ";
     $sql .= " `public_status`=1";
     $result = mysqli_query($con, $sql);
@@ -124,7 +126,7 @@ if ($total_records != 0)
     <main>
         <div class="container2">
             <h1><?php if (isset($_GET['id'])) {
-                    echo $user_name . "的公開行程";
+                    echo $user_name . "的公開行程" . $sql;
                 } else if (isset($name)) {
                     if (!empty($_GET["keyword"])) {
                         echo "關鍵字:" . $name;

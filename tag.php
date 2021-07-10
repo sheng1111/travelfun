@@ -167,7 +167,10 @@ if ($total_records != 0)
                     $j = 1;
                     while ($row = mysqli_fetch_assoc($result) and $j <= $records_per_page) {
                         $countsql = "SELECT * FROM sight ";
-                        $countsql .= " WHERE tag_area='" . $row["tag_area"] . "'";
+                        $countsql .= " WHERE ";
+                        $countsql .= "  status=1 and";
+                        $countsql .= " tag_area='" . $row["tag_area"] . "'";
+                        
                         if ($facebookswitch == 1) {
                             if ($_GET["source"] == "instagram") {
                                 $countsql .= " and source=0 ";
