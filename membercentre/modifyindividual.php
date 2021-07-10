@@ -13,16 +13,16 @@ $id = $row["user_id"];
 $useremail = $row["user_email"];
 $username = $row["user_name"];
 $introduction = 	$row["introduction"];
+$databasepassword = $row["user_password"];
 
 
 if (isset($_POST['submit'])) {
 	$username = strip_tags($_POST['user_name']);
-	$rowuseremail = strip_tags($_POST['rowemail']);
+	$rowuseremail = $row["user_email"];
 	$useremail = strip_tags($_POST['user_email']);
-	$userpassword = strip_tags($_POST['password']);
-	$checkpassword = strip_tags($_POST['checkpassword']);
-	$oldpassword = strip_tags($_POST['oldpassword']);
-	$databasepassword = $row["user_password"];
+	$userpassword = hash('sha512',base64_encode(strip_tags($_POST['password'])));
+	$checkpassword = hash('sha512',base64_encode(strip_tags($_POST['checkpassword'])));
+	$oldpassword = hash('sha512',base64_encode(strip_tags($_POST['oldpassword'])));
 	$introduction = 	strip_tags($_POST["introduction"]);
 
 	//檢查信箱重複
@@ -33,8 +33,13 @@ if (isset($_POST['submit'])) {
 		$error = true;
 		$email_error = "這個信箱已經有人註冊過了!";
 	}
-	if ($oldpassword != "") {
-		if (strlen($userpassword) < 6) {
+	if($useremail != $rowuseremail && $_POST['oldpassword'] == ""){
+		$error = true;
+		$email_error = "請輸入舊密碼才能變更信箱!";
+	}
+
+	if ($_POST['oldpassword'] != "") {
+		if (strlen($_POST['password']) < 6 && $_POST['checkpassword'] != "") {
 			$error = true;
 			$password_error = "你的密碼不能小於6碼喔!";
 		}
@@ -46,7 +51,10 @@ if (isset($_POST['submit'])) {
 			$error = true;
 			$upassword_error = "您的舊密碼輸入錯誤!";
 		}
-	} else if ($userpassword != "" or $checkpassword != "") {
+		if ($_POST['password'] == "" or $_POST['checkpassword'] == "") {
+			$userpassword = $databasepassword;
+		}
+	} else if ($_POST['password'] != "" or $_POST['checkpassword'] != "") {
 		$error = true;
 		$errormsg = "修改個人資料失敗";
 		$upassword_error2 = "請輸入舊密碼才能更改密碼喔!";
@@ -66,7 +74,8 @@ if (isset($_POST['submit'])) {
 				introduction='" . $introduction . "'
 				WHERE `user_id` = '" . $id . "'";
 		if (mysqli_query($con, $sqlUpdate)) {
-			setcookie("user_key", $random, time() + (60 * 60));
+			if(isset($_COOKIE["user_key"]))
+			{$_SESSION['user_key']=$random;}
 			$successmsg = "修改個人資料成功";
 		} else {
 			$errormsg = "修改個人資料失敗";
