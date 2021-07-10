@@ -8,11 +8,11 @@ mysqli_query($con, "SET NAMES UTF8");
 $user_id = $_SESSION['user_id'];
 //收藏景點功能
 if (isset($_GET['addfavorite'])) {
-    if (isset($_GET["page"])) {
-        $pageget = "?page=" . $_GET["page"];
-    } else {
-        $pageget = "";
-    }
+    if (!empty($_GET["tagname"])||!empty($_GET["keyword"])||isset($_GET["page"])){$start="?";}
+    if (!empty($_GET["keyword"])) {$nameget="keyword=".$_GET["keyword"];}
+    if (!empty($_GET["tagname"])) {$nameget="tagname=".$_GET["tagname"];}
+    if (!empty($_GET["tagname"])&&isset($_GET["page"])) {$and="&";}
+    if (isset($_GET["page"])) {$pageget = "page=" . $_GET["page"];}
     $view_id = $_GET['addfavorite'];
     $check = "SELECT `view_id` FROM `favorites` WHERE `user_id` ='" . $user_id . "' and view_id = $view_id";
     $chresult = mysqli_query($con, $check);
@@ -26,7 +26,7 @@ if (isset($_GET['addfavorite'])) {
         $addsql = "INSERT INTO `favorites`(`user_id`, `view_id`) VALUES
     ('" . $user_id . "', '" . $view_id . "')";
         mysqli_query($con, $addsql);
-        header("Location: result.php" . $pageget . "");
+        header("Location: result.php" .$start. $pageget .$and. $nameget."");
     }
 }
 //接收搜尋頁面的資料(SQL語法變數設定)
@@ -457,7 +457,7 @@ if ($total_records != 0)
                     }
                     if ($googlemapswitch == 1) {
                         if (empty($checkaddressrow)) {
-                            echo "<a href='https://www.google.com.tw/maps/place/" . $row["view_name"] . "'><img src='image/map.png' width='20' height='20' border='0' title='" . $row["view_name"] . "'></a>";
+                            echo "<a href='https://www.google.com.tw/maps/search/" . $row["view_name"] . "'><img src='image/map.png' width='20' height='20' border='0' title='" . $row["view_name"] . "'></a>";
                         } else {
                             echo "<a href='https://www.google.com.tw/maps/place/" . $address . "'><img src='image/map.png' width='20' height='20' border='0' title='" . $row["view_name"] . "'></a>";
                         }
